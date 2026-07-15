@@ -88,7 +88,7 @@ function EventDetail() {
           </div>
 
           <div className="mt-6 flex items-baseline gap-2">
-            <div className="text-4xl font-black text-gradient-gold">₹{Number(event.price).toLocaleString()}</div>
+            <div className="text-4xl font-black text-gradient-gold">MMK {Number(event.price).toLocaleString()}</div>
             <div className="text-xs text-muted-foreground">per ticket</div>
           </div>
 

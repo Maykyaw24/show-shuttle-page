@@ -110,46 +110,70 @@ function NewEvent() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-black">Create event</h1>
-        <p className="text-sm text-muted-foreground">Our AI trust checker will score your listing before admin review.</p>
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-1.5 rounded-full bg-gradient-gold shadow-gold" />
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight">Create event</h1>
+            <p className="text-sm text-muted-foreground">Our AI trust checker will score your listing before admin review.</p>
+          </div>
+        </div>
 
-        <form onSubmit={onSubmit} className="mt-6 rounded-2xl border border-border/60 card-premium p-6 grid gap-4">
-          <Field label="Event title"><input required value={form.title} onChange={(e) => set("title", e.target.value)} className="input" /></Field>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Artist"><input required value={form.artist} onChange={(e) => set("artist", e.target.value)} className="input" /></Field>
+        <form onSubmit={onSubmit} className="mt-8 rounded-3xl border border-border/60 card-premium p-6 md:p-8 grid gap-5 shadow-elegant">
+          <SectionHeader step="1" title="Basics" hint="What is the event called and who's playing?" />
+          <Field label="Event title"><input required value={form.title} onChange={(e) => set("title", e.target.value)} className="input" placeholder="e.g. Midnight Sessions with The Aces" /></Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Artist"><input required value={form.artist} onChange={(e) => set("artist", e.target.value)} className="input" placeholder="Main performer" /></Field>
             <Field label="Category">
-              <select value={form.category} onChange={(e) => set("category", e.target.value)} className="input capitalize">
-                {CATS.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <div className="relative">
+                <select value={form.category} onChange={(e) => set("category", e.target.value)} className="input select-input capitalize pr-10">
+                  {CATS.map((c) => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">▾</span>
+              </div>
             </Field>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Venue"><input required value={form.venue} onChange={(e) => set("venue", e.target.value)} className="input" /></Field>
-            <Field label="City"><input required value={form.city} onChange={(e) => set("city", e.target.value)} className="input" /></Field>
+
+          <div className="h-px bg-border/60 my-1" />
+          <SectionHeader step="2" title="When & where" hint="Location and showtime." />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="Venue"><input required value={form.venue} onChange={(e) => set("venue", e.target.value)} className="input" placeholder="Venue name" /></Field>
+            <Field label="City"><input required value={form.city} onChange={(e) => set("city", e.target.value)} className="input" placeholder="Yangon" /></Field>
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-3">
             <Field label="Date & time"><input required type="datetime-local" value={form.event_date} onChange={(e) => set("event_date", e.target.value)} className="input" /></Field>
-            <Field label="Price (₹)"><input required type="number" min="0" step="0.01" value={form.price} onChange={(e) => set("price", e.target.value)} className="input" /></Field>
-            <Field label="Ticket count"><input required type="number" min="1" value={form.ticket_count} onChange={(e) => set("ticket_count", e.target.value)} className="input" /></Field>
+            <Field label="Price (MMK)">
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground">MMK</span>
+                <input required type="number" min="0" step="1" value={form.price} onChange={(e) => set("price", e.target.value)} className="input pl-16" placeholder="25000" />
+              </div>
+            </Field>
+            <Field label="Ticket count"><input required type="number" min="1" value={form.ticket_count} onChange={(e) => set("ticket_count", e.target.value)} className="input" placeholder="100" /></Field>
           </div>
+
+          <div className="h-px bg-border/60 my-1" />
+          <SectionHeader step="3" title="Story & visuals" hint="Sell the vibe. Use AI if you're stuck." />
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Description</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Description</span>
               <button
                 type="button"
                 onClick={() => setAiOpen(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-gradient-gold text-primary-foreground shadow-gold hover:opacity-90"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-gradient-gold text-primary-foreground shadow-gold hover:opacity-90 transition"
               >
                 <Sparkles className="w-3.5 h-3.5" /> Generate with AI
               </button>
             </div>
-            <textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={5} className="input min-h-[120px] mt-1" placeholder="Describe your event, or use ✨ Generate with AI" />
+            <textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={5} className="input min-h-[140px] mt-1.5" placeholder="Describe your event, or use ✨ Generate with AI" />
           </div>
           <Field label="Event image">
-            <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} className="text-sm" />
-            {form.image_url && <img src={form.image_url} alt="preview" className="mt-2 rounded-lg max-h-48 border border-border/60" />}
+            <label className="flex items-center justify-center gap-2 h-24 rounded-2xl border-2 border-dashed border-border/60 hover:border-primary/60 hover:bg-primary/5 cursor-pointer transition text-sm text-muted-foreground">
+              <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} className="hidden" />
+              {form.image_url ? "Replace image" : "Click to upload cover image (max 1.5 MB)"}
+            </label>
+            {form.image_url && <img src={form.image_url} alt="preview" className="mt-3 rounded-xl max-h-56 border border-border/60" />}
           </Field>
-          <button disabled={submitting} className="h-12 rounded-full bg-gradient-gold text-primary-foreground font-medium shadow-gold disabled:opacity-50">
+
+          <button disabled={submitting} className="mt-2 h-13 py-3.5 rounded-full bg-gradient-gold text-primary-foreground font-semibold text-base shadow-gold hover:opacity-95 disabled:opacity-50 transition">
             {submitting ? "Submitting…" : "Submit for review"}
           </button>
         </form>
@@ -165,7 +189,7 @@ function NewEvent() {
 
             {!aiDraft ? (
               <div className="grid gap-3">
-                <p className="text-sm text-muted-foreground">Using: <b>{form.artist || "?"}</b> · {form.venue || "?"}, {form.city || "?"} · {form.event_date || "?"} · ₹{form.price || "?"} · {form.category}</p>
+                <p className="text-sm text-muted-foreground">Using: <b>{form.artist || "?"}</b> · {form.venue || "?"}, {form.city || "?"} · {form.event_date || "?"} · MMK {form.price || "?"} · {form.category}</p>
                 <Field label="Vibe / mood (optional)">
                   <input value={aiVibe} onChange={(e) => setAiVibe(e.target.value)} placeholder="e.g. energetic, intimate acoustic, festival-style" className="input" />
                 </Field>
@@ -209,8 +233,26 @@ function NewEvent() {
         </div>
       )}
 
-      <style>{`.input{height:44px;border-radius:9999px;background:hsl(var(--input));padding:0 1.25rem;font-size:.875rem;outline:none;width:100%}
-      textarea.input{border-radius:1rem;padding:.75rem 1rem;height:auto}`}</style>
+      <style>{`
+        .input{height:44px;border-radius:9999px;background:var(--color-input);color:var(--color-foreground);padding:0 1.25rem;font-size:.875rem;outline:none;width:100%;border:1px solid oklch(0.35 0.04 75 / 0.35);transition:border-color .15s, box-shadow .15s, background .15s}
+        .input:hover{border-color:oklch(0.55 0.08 75 / 0.5)}
+        .input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px oklch(0.82 0.15 82 / 0.18)}
+        textarea.input{border-radius:1rem;padding:.85rem 1.1rem;height:auto;line-height:1.55}
+        .select-input{appearance:none;-webkit-appearance:none;background-image:none;cursor:pointer}
+        .select-input option{background:var(--color-card);color:var(--color-foreground)}
+      `}</style>
+    </div>
+  );
+}
+
+function SectionHeader({ step, title, hint }: { step: string; title: string; hint: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="grid place-items-center h-7 w-7 rounded-full bg-gradient-gold text-primary-foreground text-xs font-black shadow-gold">{step}</span>
+      <div>
+        <div className="font-semibold text-sm">{title}</div>
+        <div className="text-xs text-muted-foreground">{hint}</div>
+      </div>
     </div>
   );
 }
@@ -218,8 +260,8 @@ function NewEvent() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <div className="mt-1">{children}</div>
+      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
+      <div className="mt-1.5">{children}</div>
     </label>
   );
 }

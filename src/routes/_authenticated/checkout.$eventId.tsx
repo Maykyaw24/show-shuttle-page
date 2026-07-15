@@ -88,8 +88,8 @@ function Checkout() {
                 <div className="flex justify-between"><span className="text-muted-foreground">Event</span><span>{event.title}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Date</span><span>{new Date(event.event_date).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Tickets</span><span>{qty}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Price / ticket</span><span>₹{Number(event.price).toLocaleString()}</span></div>
-                <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border/60 mt-2"><span>Total</span><span className="text-gradient-gold">₹{total.toLocaleString()}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Price / ticket</span><span>MMK {Number(event.price).toLocaleString()}</span></div>
+                <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border/60 mt-2"><span>Total</span><span className="text-gradient-gold">MMK {total.toLocaleString()}</span></div>
               </div>
               <button
                 onClick={onCreateOrder}
@@ -106,7 +106,7 @@ function Checkout() {
                 <div className="font-medium">Manual payment instructions</div>
                 <div className="rounded-lg border border-border/60 p-3">
                   <div className="text-muted-foreground">Send</div>
-                  <div className="font-bold text-lg text-gradient-gold">₹{total.toLocaleString()}</div>
+                  <div className="font-bold text-lg text-gradient-gold">MMK {total.toLocaleString()}</div>
                   <div className="text-xs text-muted-foreground mt-2">UPI: livebeat@upi · Bank: LiveBeat Ltd · Ref: {orderId.slice(0, 8)}</div>
                 </div>
                 <label className="block">

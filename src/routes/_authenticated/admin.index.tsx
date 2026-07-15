@@ -127,7 +127,7 @@ function AdminHome() {
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        {e.artist} · {e.venue}, {e.city} · {new Date(e.event_date).toLocaleDateString()} · ₹{Number(e.price).toLocaleString()} × {e.ticket_count}
+                        {e.artist} · {e.venue}, {e.city} · {new Date(e.event_date).toLocaleDateString()} · MMK {Number(e.price).toLocaleString()} × {e.ticket_count}
                       </div>
                       {e.trust_reason && <div className="text-xs text-muted-foreground mt-1 italic">🤖 {e.trust_reason}</div>}
                     </div>
@@ -167,7 +167,7 @@ function AdminHome() {
                         <StatusBadge status={o.status} />
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Order #{o.id.slice(0, 8)} · {o.quantity} ticket(s) · ₹{Number(o.total_price).toLocaleString()}
+                        Order #{o.id.slice(0, 8)} · {o.quantity} ticket(s) · MMK {Number(o.total_price).toLocaleString()}
                       </div>
                       {o.payment_proof_url && (
                         <a href={o.payment_proof_url} target="_blank" rel="noreferrer" className="mt-2 inline-block">

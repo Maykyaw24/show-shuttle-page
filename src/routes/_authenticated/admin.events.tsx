@@ -146,7 +146,7 @@ function AdminEventsPage() {
                       <Field label="Category" value={e.category} />
                       <Field label="Venue" value={`${e.venue}, ${e.city}`} />
                       <Field label="Date" value={new Date(e.event_date).toLocaleString()} />
-                      <Field label="Price" value={`₹${Number(e.price).toLocaleString()}`} />
+                      <Field label="Price" value={`MMK ${Number(e.price).toLocaleString()}`} />
                       <Field label="Tickets" value={String(e.ticket_count)} />
                       {e.trust_level && <Field label="AI verdict" value={String(e.trust_level).replace("_", " ")} />}
                       <Field label="Status" value={e.status} />

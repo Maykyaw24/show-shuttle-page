@@ -77,7 +77,7 @@ function BuyerHome() {
                     <div className="font-medium truncate">{e.title}</div>
                     <div className="text-xs text-muted-foreground truncate">{e.venue}, {e.city}</div>
                     <div className="mt-2 flex items-center justify-between">
-                      <span className="text-sm font-bold text-gradient-gold">₹{Number(e.price).toLocaleString()}</span>
+                      <span className="text-sm font-bold text-gradient-gold">MMK {Number(e.price).toLocaleString()}</span>
                       {soldOut ? <span className="text-[10px] px-2 py-0.5 rounded-full bg-destructive/15 text-destructive">Sold out</span> : <span className="text-[10px] text-muted-foreground">{remaining} left</span>}
                     </div>
                   </div>
@@ -98,7 +98,7 @@ function BuyerHome() {
                 <div key={o.id} className="rounded-lg border border-border/60 p-3 flex items-center justify-between gap-2 text-sm">
                   <div className="min-w-0">
                     <div className="font-medium truncate">{(o as { events?: { title?: string } }).events?.title ?? "Event"}</div>
-                    <div className="text-xs text-muted-foreground">{o.quantity} ticket(s) · ₹{Number(o.total_price).toLocaleString()}</div>
+                    <div className="text-xs text-muted-foreground">{o.quantity} ticket(s) · MMK {Number(o.total_price).toLocaleString()}</div>
                   </div>
                   <StatusBadge status={o.status} />
                 </div>
