@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Html5Qrcode } from "html5-qrcode";
 import { lookupTicket, markTicketUsed } from "@/lib/marketplace.functions";
 
 export const Route = createFileRoute("/_authenticated/scan")({
