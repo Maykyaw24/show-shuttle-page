@@ -53,7 +53,7 @@ function BuyerHome() {
 
   return (
     <DashboardShell
-      title={<>Welcome back, <span className="text-gradient-gold">{name}</span></> as unknown as string}
+      title={<>Welcome back, <span className="text-gradient-gold">{name}</span></>}
       subtitle="Find your next concert, manage your tickets, and let our AI help you decide."
       nav={NAV}
     >

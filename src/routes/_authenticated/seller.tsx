@@ -37,7 +37,7 @@ function SellerHome() {
 
   return (
     <DashboardShell
-      title={<>Welcome, <span className="text-gradient-gold">{name}</span></> as unknown as string}
+      title={<>Welcome, <span className="text-gradient-gold">{name}</span></>}
       subtitle={`${org} · Manage your concerts, sales, and payouts.`}
       badge={
         <span className="text-xs px-3 py-1 rounded-full bg-primary/15 text-primary border border-primary/30 uppercase tracking-wide">
