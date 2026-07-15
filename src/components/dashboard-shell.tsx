@@ -10,12 +10,14 @@ export function DashboardShell({
   subtitle,
   badge,
   nav,
+  userBadge,
   children,
 }: {
   title: ReactNode;
   subtitle?: ReactNode;
   badge?: ReactNode;
   nav?: NavItem[];
+  userBadge?: ReactNode;
   children: ReactNode;
 }) {
   const navigate = useNavigate();
@@ -46,20 +48,25 @@ export function DashboardShell({
                   to={n.to}
                   className="px-3 py-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition"
                   activeProps={{ className: "px-3 py-1.5 rounded-full bg-muted text-foreground" }}
+                  activeOptions={{ exact: true }}
                 >
                   {n.label}
                 </Link>
               ))}
             </nav>
           )}
-          <button
-            onClick={signOut}
-            className="text-sm px-4 py-2 rounded-full border border-border hover:bg-muted transition"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            {userBadge}
+            <button
+              onClick={signOut}
+              className="text-sm px-4 py-2 rounded-full border border-border hover:bg-muted transition"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-10">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
