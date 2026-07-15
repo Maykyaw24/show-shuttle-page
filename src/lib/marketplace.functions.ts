@@ -88,53 +88,6 @@ export const createEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => createEventSchema.parse(i))
   .handler(async ({ data, context }) => {
-    // AI trust check (best-effort)
-    let trust: { level: "trusted" | "needs_review" | "suspicious"; reason: string } = {
-      level: "needs_review",
-      reason: "Automatic check unavailable; queued for manual review.",
-    };
-    try {
-      const apiKey = process.env.LOVABLE_API_KEY;
-      if (apiKey) {
-        const prompt = `You are a fraud analyst reviewing a concert ticket listing on a marketplace. Return STRICT JSON: {"level":"trusted|needs_review|suspicious","reason":"one short sentence"}.
-Consider: unrealistic pricing, vague/copy-pasted descriptions, mismatched artist/venue, past dates, missing image.
-Listing:
-Title: ${data.title}
-Artist: ${data.artist}
-Venue: ${data.venue}, ${data.city}
-Category: ${data.category}
-Date: ${data.event_date}
-Price: ${data.price}
-Tickets: ${data.ticket_count}
-Description: ${data.description ?? "(none)"}
-Image: ${data.image_url ? "provided" : "missing"}`;
-        const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { "content-type": "application/json", "Lovable-API-Key": apiKey },
-          body: JSON.stringify({
-            model: "google/gemini-3.5-flash",
-            messages: [
-              { role: "system", content: "Return only strict JSON." },
-              { role: "user", content: prompt },
-            ],
-          }),
-        });
-        if (r.ok) {
-          const j: { choices?: { message?: { content?: string } }[] } = await r.json();
-          const txt = j.choices?.[0]?.message?.content ?? "";
-          const m = txt.match(/\{[\s\S]*\}/);
-          if (m) {
-            const parsed = JSON.parse(m[0]);
-            if (parsed.level && ["trusted", "needs_review", "suspicious"].includes(parsed.level)) {
-              trust = { level: parsed.level, reason: String(parsed.reason ?? "") };
-            }
-          }
-        }
-      }
-    } catch (e) {
-      console.error("trust check failed", e);
-    }
-
     const { data: row, error } = await context.supabase
       .from("events")
       .insert({
@@ -150,14 +103,13 @@ Image: ${data.image_url ? "provided" : "missing"}`;
         description: data.description ?? null,
         image_url: data.image_url ?? null,
         status: "pending",
-        trust_level: trust.level,
-        trust_reason: trust.reason,
       })
       .select()
       .single();
     if (error) throw new Error(error.message);
     return row;
   });
+
 
 export const listMyEvents = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
