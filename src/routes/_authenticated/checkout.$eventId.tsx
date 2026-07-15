@@ -94,7 +94,13 @@ function Checkout() {
                 <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border/60 mt-2"><span>Total</span><span className="text-gradient-gold">MMK {total.toLocaleString()}</span></div>
               </div>
               <div className="mt-5 rounded-xl border border-border/60 p-3 flex items-center gap-3 bg-muted/30">
-                <img src={kpayQr.url} alt="KBZPay" className="w-14 h-14 rounded-md object-cover" />
+                <button
+                  type="button"
+                  onClick={() => setLightboxOpen(true)}
+                  className="shrink-0 rounded-md overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <img src={kpayQr.url} alt="KBZPay" className="w-14 h-14 object-cover" />
+                </button>
                 <div className="text-xs">
                   <div className="font-semibold">Pay with KBZPay</div>
                   <div className="text-muted-foreground">Scan QR after creating your order</div>
