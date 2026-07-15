@@ -26,6 +26,7 @@ function Checkout() {
   const [orderId, setOrderId] = useState<string | null>(null);
   const [proof, setProof] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const { data: event } = useQuery({
     queryKey: ["event", eventId],
