@@ -30,12 +30,15 @@ const trustColor = (l?: string | null) =>
 
 function AdminHome() {
   const [tab, setTab] = useState<"queue" | "orders">("queue");
+  const [checkingId, setCheckingId] = useState<string | null>(null);
   const listEvents = useServerFn(adminListPendingEvents);
   const setStatus = useServerFn(adminSetEventStatus);
   const listOrders = useServerFn(adminListOrders);
   const confirmOrder = useServerFn(adminConfirmOrder);
   const rejectOrder = useServerFn(adminRejectOrder);
+  const checkTrust = useServerFn(adminCheckEventTrust);
   const qc = useQueryClient();
+
 
   const { data: events } = useQuery({ queryKey: ["admin", "events"], queryFn: () => listEvents() });
   const { data: orders } = useQuery({ queryKey: ["admin", "orders"], queryFn: () => listOrders() });
