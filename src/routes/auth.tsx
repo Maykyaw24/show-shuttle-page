@@ -25,7 +25,7 @@ function AuthPage() {
   // Redirect away if already signed in
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard" });
+      if (data.session) navigate({ to: "/" });
     });
   }, [navigate]);
 
@@ -92,7 +92,7 @@ function LoginForm() {
       return toast.error(error.message);
     }
     toast.success("Welcome back!");
-    navigate({ to: "/dashboard" });
+    navigate({ to: "/" });
   };
 
   return (
@@ -165,7 +165,7 @@ function SignupForm() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/`,
           // Stash the payload in user_metadata so the server can materialize
           // the role + profile on first login even without an initial session.
           data: { full_name: fullName, pending_signup: payload },
@@ -180,7 +180,7 @@ function SignupForm() {
 
       await completeSignup({ data: payload as never });
       toast.success("Account created!");
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
