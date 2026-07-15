@@ -120,7 +120,13 @@ function Checkout() {
               <div className="mt-6 space-y-3 text-sm">
                 <div className="font-medium">Pay with KBZPay</div>
                 <div className="rounded-xl border border-border/60 p-4 bg-white text-slate-900 grid gap-3 place-items-center text-center">
-                  <img src={kpayQr.url} alt="KBZPay QR — May Thandar Kyaw" className="w-56 h-auto rounded-lg" />
+                  <button
+                    type="button"
+                    onClick={() => setLightboxOpen(true)}
+                    className="rounded-lg overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <img src={kpayQr.url} alt="KBZPay QR — May Thandar Kyaw" className="w-56 h-auto" />
+                  </button>
                   <div className="text-xs text-slate-600">Open KBZPay app → Scan QR</div>
                   <div className="text-xs text-slate-700">Recipient: <b>May Thandar Kyaw</b> (******9191)</div>
                   <div className="text-lg font-black text-gradient-gold">MMK {total.toLocaleString()}</div>
