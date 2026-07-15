@@ -15,7 +15,6 @@ const NAV = [
   { label: "Home", to: "/buyer" },
   { label: "Browse", to: "/browse" },
   { label: "My Tickets", to: "/my-tickets" },
-  { label: "Dashboard", to: "/dashboard" },
 ];
 
 function BuyerHome() {

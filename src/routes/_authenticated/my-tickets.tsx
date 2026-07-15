@@ -48,7 +48,7 @@ function MyTickets() {
           <Link to="/" className="font-black text-gradient-gold">LiveBeat</Link>
           <nav className="flex gap-4 text-sm">
             <Link to="/browse" className="hover:text-primary">Browse</Link>
-            <Link to="/dashboard" className="hover:text-primary">Dashboard</Link>
+            <Link to="/" className="hover:text-primary">Home</Link>
           </nav>
         </div>
       </header>

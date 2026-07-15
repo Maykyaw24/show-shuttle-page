@@ -25,7 +25,7 @@ export function DashboardShell({
   const signOut = async () => {
     await supabase.auth.signOut();
     toast.success("Signed out");
-    navigate({ to: "/auth", replace: true });
+    navigate({ to: "/", replace: true });
   };
 
   return (
