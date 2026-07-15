@@ -20,7 +20,7 @@ export function BackButton() {
   };
 
   return (
-    <div className="fixed top-3 left-3 z-50">
+    <div className="fixed top-20 left-4 z-40">
       {canGoBack ? (
         <button
           type="button"
