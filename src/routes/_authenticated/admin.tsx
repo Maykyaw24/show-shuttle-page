@@ -18,9 +18,15 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 const NAV = [
   { label: "Dashboard", to: "/dashboard" },
-  { label: "Admin", to: "/admin" },
+  { label: "Events", to: "/admin/events" },
   { label: "Scan", to: "/scan" },
 ];
+
+const ADMIN_BADGE = (
+  <span className="text-xs px-3 py-1 rounded-full bg-destructive/15 text-destructive border border-destructive/30 uppercase tracking-wide">
+    Admin
+  </span>
+);
 
 const trustColor = (l?: string | null) =>
   l === "trusted" ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10"
