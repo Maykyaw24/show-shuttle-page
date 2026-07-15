@@ -26,6 +26,7 @@ function Checkout() {
   const [orderId, setOrderId] = useState<string | null>(null);
   const [proof, setProof] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const { data: event } = useQuery({
     queryKey: ["event", eventId],
@@ -93,7 +94,13 @@ function Checkout() {
                 <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border/60 mt-2"><span>Total</span><span className="text-gradient-gold">MMK {total.toLocaleString()}</span></div>
               </div>
               <div className="mt-5 rounded-xl border border-border/60 p-3 flex items-center gap-3 bg-muted/30">
-                <img src={kpayQr.url} alt="KBZPay" className="w-14 h-14 rounded-md object-cover" />
+                <button
+                  type="button"
+                  onClick={() => setLightboxOpen(true)}
+                  className="shrink-0 rounded-md overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <img src={kpayQr.url} alt="KBZPay" className="w-14 h-14 object-cover" />
+                </button>
                 <div className="text-xs">
                   <div className="font-semibold">Pay with KBZPay</div>
                   <div className="text-muted-foreground">Scan QR after creating your order</div>
@@ -113,7 +120,13 @@ function Checkout() {
               <div className="mt-6 space-y-3 text-sm">
                 <div className="font-medium">Pay with KBZPay</div>
                 <div className="rounded-xl border border-border/60 p-4 bg-white text-slate-900 grid gap-3 place-items-center text-center">
-                  <img src={kpayQr.url} alt="KBZPay QR — May Thandar Kyaw" className="w-56 h-auto rounded-lg" />
+                  <button
+                    type="button"
+                    onClick={() => setLightboxOpen(true)}
+                    className="rounded-lg overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <img src={kpayQr.url} alt="KBZPay QR — May Thandar Kyaw" className="w-56 h-auto" />
+                  </button>
                   <div className="text-xs text-slate-600">Open KBZPay app → Scan QR</div>
                   <div className="text-xs text-slate-700">Recipient: <b>May Thandar Kyaw</b> (******9191)</div>
                   <div className="text-lg font-black text-gradient-gold">MMK {total.toLocaleString()}</div>
@@ -150,6 +163,31 @@ function Checkout() {
           </ol>
         </aside>
       </main>
+
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 p-4 backdrop-blur-sm"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 md:top-6 md:right-6 z-10 flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+            aria-label="Close"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+          <img
+            src={kpayQr.url}
+            alt="KBZPay QR full size"
+            className="max-w-[90vw] max-h-[85vh] rounded-xl object-contain shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
