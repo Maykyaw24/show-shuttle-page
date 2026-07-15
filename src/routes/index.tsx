@@ -171,10 +171,11 @@ function Concerts({ onBuy }: { onBuy: (reason: string) => void }) {
         <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {concerts.map((c) => (
             <article key={c.artist} className="card-premium rounded-2xl overflow-hidden group hover:shadow-elegant transition">
-              <div className={`relative h-48 bg-gradient-to-br ${c.gradient} flex items-center justify-center`}>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,215,120,0.35),transparent_60%)]" />
-                <span className="text-6xl relative z-10 drop-shadow-lg">{c.emoji}</span>
-                <button aria-label="Save" onClick={() => onBuy("Sign in to save concerts")} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-background/60 backdrop-blur flex items-center justify-center text-primary hover:bg-background/90 transition">♥</button>
+              <div className="relative h-48 overflow-hidden">
+                <img src={c.image} alt={`${c.artist} live in concert`} loading="lazy" width={1200} height={900} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+                <button aria-label="Save" onClick={() => onBuy("Sign in to save concerts")} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-background/70 backdrop-blur flex items-center justify-center text-primary hover:bg-background/90 transition">♥</button>
+                <span className="absolute bottom-2 left-3 text-[10px] uppercase tracking-widest text-primary/90 font-semibold">● Live</span>
               </div>
               <div className="p-5">
                 <h3 className="font-display text-xl">{c.artist}</h3>
