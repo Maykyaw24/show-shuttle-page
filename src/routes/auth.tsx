@@ -142,22 +142,8 @@ function SignupForm() {
         throw new Error("Invalid admin code");
       }
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-          data: { full_name: fullName },
-        },
-      });
-      if (error) throw error;
-      if (!data.session) {
-        toast.success("Check your email to confirm your account.");
-        navigate({ to: "/check-email", search: { email } });
-        return;
-      }
-
-      // Session exists — call the server fn to write role + profile
+      // Build the full signup payload so we can persist it whether or not
+      // signUp() returns an immediate session (email confirmation on/off).
       const payload =
         role === "buyer"
           ? { role, full_name: fullName, phone, city, avatar_url: avatarUrl || null }
@@ -174,6 +160,23 @@ function SignupForm() {
               avatar_url: avatarUrl || null,
             }
           : { role, full_name: fullName, admin_code: adminCode };
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          // Stash the payload in user_metadata so the server can materialize
+          // the role + profile on first login even without an initial session.
+          data: { full_name: fullName, pending_signup: payload },
+        },
+      });
+      if (error) throw error;
+      if (!data.session) {
+        toast.success("Check your email to confirm your account.");
+        navigate({ to: "/check-email", search: { email } });
+        return;
+      }
 
       await completeSignup({ data: payload as never });
       toast.success("Account created!");
