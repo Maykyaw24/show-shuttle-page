@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/admin/events")({
 });
 
 const NAV = [
-  { label: "Home", to: "/admin" },
+  { label: "Dashboard", to: "/dashboard" },
   { label: "Events", to: "/admin/events" },
   { label: "Scan", to: "/scan" },
 ];

@@ -36,7 +36,7 @@ function LandingPage() {
   const { user } = useSession();
 
   const goAuth = (_reason?: string) => {
-    if (user) navigate({ to: "/" });
+    if (user) navigate({ to: "/dashboard" });
     else navigate({ to: "/auth" });
   };
 

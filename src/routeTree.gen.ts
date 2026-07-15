@@ -20,6 +20,7 @@ import { Route as EventsIdRouteImport } from './routes/events.$id'
 import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBuyerRouteImport } from './routes/_authenticated/buyer'
 import { Route as AuthenticatedSellerIndexRouteImport } from './routes/_authenticated/seller.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -82,6 +83,11 @@ const AuthenticatedMyTicketsRoute = AuthenticatedMyTicketsRouteImport.update({
   path: '/my-tickets',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBuyerRoute = AuthenticatedBuyerRouteImport.update({
   id: '/buyer',
   path: '/buyer',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/buyer': typeof AuthenticatedBuyerRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/seller': typeof AuthenticatedSellerRouteWithChildren
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/buyer': typeof AuthenticatedBuyerRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/events/$id': typeof EventsIdRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/buyer': typeof AuthenticatedBuyerRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/seller': typeof AuthenticatedSellerRouteWithChildren
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/buyer'
+    | '/dashboard'
     | '/my-tickets'
     | '/scan'
     | '/seller'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/buyer'
+    | '/dashboard'
     | '/my-tickets'
     | '/scan'
     | '/events/$id'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/_authenticated/buyer'
+    | '/_authenticated/dashboard'
     | '/_authenticated/my-tickets'
     | '/_authenticated/scan'
     | '/_authenticated/seller'
@@ -330,6 +342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyTicketsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/buyer': {
       id: '/_authenticated/buyer'
       path: '/buyer'
@@ -397,6 +416,7 @@ const AuthenticatedSellerRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBuyerRoute: typeof AuthenticatedBuyerRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSellerRoute: typeof AuthenticatedSellerRouteWithChildren
@@ -408,6 +428,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBuyerRoute: AuthenticatedBuyerRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSellerRoute: AuthenticatedSellerRouteWithChildren,
