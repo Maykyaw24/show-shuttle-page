@@ -65,7 +65,7 @@ function Header({ onLogin, onSell }: { onLogin: () => void; onSell: () => void }
           <div className="w-9 h-9 rounded-lg bg-gradient-gold flex items-center justify-center shadow-gold">
             <span className="text-primary-foreground font-bold text-lg">T</span>
           </div>
-          <span className="font-display text-xl tracking-wide">Ticket<span className="text-gradient-gold">Hub</span></span>
+          <span className="font-display text-xl tracking-wide">Live<span className="text-gradient-gold">Beat</span></span>
         </a>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#concerts" className="hover:text-foreground transition">Concerts</a>
@@ -254,7 +254,7 @@ function AIChatbot({ onTry }: { onTry: () => void }) {
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <div className="w-9 h-9 rounded-full bg-gradient-gold flex items-center justify-center">✨</div>
               <div>
-                <div className="font-semibold">TicketHub AI</div>
+                <div className="font-semibold">LiveBeat AI</div>
                 <div className="text-xs text-emerald-400">● Online</div>
               </div>
             </div>
@@ -408,11 +408,11 @@ function Footer() {
         <div>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-gold flex items-center justify-center text-primary-foreground font-bold">T</div>
-            <span className="font-display text-lg">Ticket<span className="text-gradient-gold">Hub</span></span>
+            <span className="font-display text-lg">Live<span className="text-gradient-gold">Beat</span></span>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">Premium tickets to the world's most unforgettable nights.</p>
         </div>
-        <FooterCol title="Contact" items={["hello@tickethub.co", "+1 (555) 010-2024", "24/7 chat support"]} />
+        <FooterCol title="Contact" items={["hello@livebeat.co", "+1 (555) 010-2024", "24/7 chat support"]} />
         <FooterCol title="Support" items={["Help center", "Refund policy", "Ticket transfer", "Report an issue"]} />
         <div>
           <div className="font-semibold mb-4">Follow</div>
@@ -425,7 +425,7 @@ function Footer() {
       </div>
       <div className="border-t border-border/60">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between text-xs text-muted-foreground gap-2">
-          <span>© 2026 TicketHub. All rights reserved.</span>
+          <span>© 2026 LiveBeat. All rights reserved.</span>
           <div className="flex gap-6">
             <a href="#" className="hover:text-foreground">Privacy</a>
             <a href="#" className="hover:text-foreground">Terms</a>
