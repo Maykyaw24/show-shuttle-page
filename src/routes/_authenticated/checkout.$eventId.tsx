@@ -101,14 +101,16 @@ function Checkout() {
           ) : (
             <>
               <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 p-3 text-sm">
-                ✅ Order created. Please pay manually and upload the receipt below.
+                ✅ Order created. Scan the KBZPay QR below to pay, then upload your receipt.
               </div>
               <div className="mt-6 space-y-3 text-sm">
-                <div className="font-medium">Manual payment instructions</div>
-                <div className="rounded-lg border border-border/60 p-3">
-                  <div className="text-muted-foreground">Send</div>
-                  <div className="font-bold text-lg text-gradient-gold">MMK {total.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground mt-2">UPI: livebeat@upi · Bank: LiveBeat Ltd · Ref: {orderId.slice(0, 8)}</div>
+                <div className="font-medium">Pay with KBZPay</div>
+                <div className="rounded-xl border border-border/60 p-4 bg-white text-slate-900 grid gap-3 place-items-center text-center">
+                  <img src={kpayQr.url} alt="KBZPay QR — May Thandar Kyaw" className="w-56 h-auto rounded-lg" />
+                  <div className="text-xs text-slate-600">Open KBZPay app → Scan QR</div>
+                  <div className="text-xs text-slate-700">Recipient: <b>May Thandar Kyaw</b> (******9191)</div>
+                  <div className="text-lg font-black text-gradient-gold">MMK {total.toLocaleString()}</div>
+                  <div className="text-[11px] text-slate-500">Reference: {orderId.slice(0, 8)}</div>
                 </div>
                 <label className="block">
                   <span className="text-sm">Upload payment screenshot</span>
