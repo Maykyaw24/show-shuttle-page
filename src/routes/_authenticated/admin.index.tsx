@@ -20,7 +20,6 @@ const NAV = [
   { label: "Dashboard", to: "/dashboard" },
   { label: "Events", to: "/admin/events" },
   { label: "Scan", to: "/scan" },
-  { label: "Assistant", to: "/chat" },
 ];
 
 const ADMIN_BADGE = (

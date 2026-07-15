@@ -15,7 +15,6 @@ const NAV = [
   { label: "Home", to: "/buyer" },
   { label: "Browse", to: "/browse" },
   { label: "My Tickets", to: "/my-tickets" },
-  { label: "Assistant", to: "/chat" },
   { label: "Dashboard", to: "/dashboard" },
 ];
 
