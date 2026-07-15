@@ -84,13 +84,20 @@ function Checkout() {
           <h1 className="text-2xl font-black">Checkout</h1>
           {!orderId ? (
             <>
-              <p className="text-sm text-muted-foreground mt-2">Review your order, then create it to get manual payment instructions.</p>
+              <p className="text-sm text-muted-foreground mt-2">Review your order, then create it to unlock the KBZPay QR.</p>
               <div className="mt-6 space-y-1 text-sm">
                 <div className="flex justify-between"><span className="text-muted-foreground">Event</span><span>{event.title}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Date</span><span>{new Date(event.event_date).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Tickets</span><span>{qty}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Price / ticket</span><span>MMK {Number(event.price).toLocaleString()}</span></div>
                 <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border/60 mt-2"><span>Total</span><span className="text-gradient-gold">MMK {total.toLocaleString()}</span></div>
+              </div>
+              <div className="mt-5 rounded-xl border border-border/60 p-3 flex items-center gap-3 bg-muted/30">
+                <img src={kpayQr.url} alt="KBZPay" className="w-14 h-14 rounded-md object-cover" />
+                <div className="text-xs">
+                  <div className="font-semibold">Pay with KBZPay</div>
+                  <div className="text-muted-foreground">Scan QR after creating your order</div>
+                </div>
               </div>
               <button
                 onClick={onCreateOrder}
