@@ -92,8 +92,8 @@ function AdminHome() {
     <DashboardShell
       title="Admin console"
       subtitle="Moderate events, approve payments, and issue tickets."
-      badge={<span className="text-xs px-3 py-1 rounded-full bg-destructive/15 text-destructive border border-destructive/30 uppercase tracking-wide">Admin</span>}
       nav={NAV}
+      userBadge={ADMIN_BADGE}
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Pending events" value={pending} hint="Needs review" tone="warn" />
