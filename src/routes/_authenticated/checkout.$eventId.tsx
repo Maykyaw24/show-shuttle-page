@@ -5,6 +5,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { getEvent, createOrder, submitPaymentProof } from "@/lib/marketplace.functions";
 import { toast } from "sonner";
+import kpayQr from "@/assets/kpay-qr.jpg.asset.json";
 
 const searchSchema = z.object({ qty: z.number().int().min(1).max(10).default(1) });
 
