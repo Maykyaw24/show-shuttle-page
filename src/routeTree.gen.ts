@@ -22,6 +22,7 @@ import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/s
 import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBuyerRouteImport } from './routes/_authenticated/buyer'
+import { Route as AuthenticatedSellerIndexRouteImport } from './routes/_authenticated/seller.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedSellerEventsRouteImport } from './routes/_authenticated/seller.events'
 import { Route as AuthenticatedSellNewRouteImport } from './routes/_authenticated/sell.new'
@@ -92,6 +93,12 @@ const AuthenticatedBuyerRoute = AuthenticatedBuyerRouteImport.update({
   path: '/buyer',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSellerIndexRoute =
+  AuthenticatedSellerIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSellerRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -139,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/sell/new': typeof AuthenticatedSellNewRoute
   '/seller/events': typeof AuthenticatedSellerEventsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/seller/': typeof AuthenticatedSellerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -151,13 +159,13 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/scan': typeof AuthenticatedScanRoute
-  '/seller': typeof AuthenticatedSellerRouteWithChildren
   '/events/$id': typeof EventsIdRoute
   '/admin/events': typeof AuthenticatedAdminEventsRoute
   '/checkout/$eventId': typeof AuthenticatedCheckoutEventIdRoute
   '/sell/new': typeof AuthenticatedSellNewRoute
   '/seller/events': typeof AuthenticatedSellerEventsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/seller': typeof AuthenticatedSellerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_authenticated/sell/new': typeof AuthenticatedSellNewRoute
   '/_authenticated/seller/events': typeof AuthenticatedSellerEventsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/seller/': typeof AuthenticatedSellerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/sell/new'
     | '/seller/events'
     | '/admin/'
+    | '/seller/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -212,13 +222,13 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/my-tickets'
     | '/scan'
-    | '/seller'
     | '/events/$id'
     | '/admin/events'
     | '/checkout/$eventId'
     | '/sell/new'
     | '/seller/events'
     | '/admin'
+    | '/seller'
   id:
     | '__root__'
     | '/'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sell/new'
     | '/_authenticated/seller/events'
     | '/_authenticated/admin/'
+    | '/_authenticated/seller/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -345,6 +356,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBuyerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/seller/': {
+      id: '/_authenticated/seller/'
+      path: '/'
+      fullPath: '/seller/'
+      preLoaderRoute: typeof AuthenticatedSellerIndexRouteImport
+      parentRoute: typeof AuthenticatedSellerRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/admin'
@@ -385,10 +403,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedSellerRouteChildren {
   AuthenticatedSellerEventsRoute: typeof AuthenticatedSellerEventsRoute
+  AuthenticatedSellerIndexRoute: typeof AuthenticatedSellerIndexRoute
 }
 
 const AuthenticatedSellerRouteChildren: AuthenticatedSellerRouteChildren = {
   AuthenticatedSellerEventsRoute: AuthenticatedSellerEventsRoute,
+  AuthenticatedSellerIndexRoute: AuthenticatedSellerIndexRoute,
 }
 
 const AuthenticatedSellerRouteWithChildren =
@@ -434,3 +454,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
