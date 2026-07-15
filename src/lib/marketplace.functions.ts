@@ -251,7 +251,7 @@ export const adminListPendingEvents = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("events")
       .select("*")
-      .in("status", ["pending", "approved", "rejected"])
+      .in("status", ["pending", "approved", "rejected", "cancelled"])
       .order("created_at", { ascending: false })
       .limit(60);
     if (error) throw new Error(error.message);
