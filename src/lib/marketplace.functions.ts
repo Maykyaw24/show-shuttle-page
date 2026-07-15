@@ -64,7 +64,7 @@ export const getEvent = createServerFn({ method: "GET" })
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data }) => {
     const sb = publicClient();
-    const { data: row, error } = await sb.from("events").select("*").eq("id", data.id).maybeSingle();
+    const { data: row, error } = await sb.from("events").select("*").eq("id", data.id).eq("status", "approved").maybeSingle();
     if (error) throw new Error(error.message);
     return row;
   });
