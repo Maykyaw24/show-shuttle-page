@@ -82,9 +82,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "LiveBeat — Premium Concert Ticket Marketplace" },
       { name: "description", content: "Discover luxury concerts, buy verified tickets, and sell with confidence. Every ticket is protected with a unique QR code and admin-approved sellers." },
       { property: "og:title", content: "LiveBeat — Premium Concert Ticket Marketplace" },
-      { property: "og:description", content: "Discover luxury concerts, buy verified tickets, and sell with confidence." },
+      { property: "og:description", content: "Discover luxury concerts, buy verified tickets, and sell with confidence. Every ticket is protected with a unique QR code and admin-approved sellers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "LiveBeat — Premium Concert Ticket Marketplace" },
+      { name: "twitter:description", content: "Discover luxury concerts, buy verified tickets, and sell with confidence. Every ticket is protected with a unique QR code and admin-approved sellers." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/097aebd0-8134-4c11-8dd2-90862bdcb6da/id-preview-7ca5da56--5c1ff8d9-4ac0-4abe-bc5e-a50b1e86c6a3.lovable.app-1784107651250.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/097aebd0-8134-4c11-8dd2-90862bdcb6da/id-preview-7ca5da56--5c1ff8d9-4ac0-4abe-bc5e-a50b1e86c6a3.lovable.app-1784107651250.png" },
     ],
     links: [
       {
