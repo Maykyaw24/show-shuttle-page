@@ -57,6 +57,63 @@ function ScanPage() {
   const [result, setResult] = useState<LookupResult | null>(null);
   const [actionMsg, setActionMsg] = useState<string | null>(null);
   const [showFull, setShowFull] = useState(false);
+  const [camOn, setCamOn] = useState(false);
+  const [camErr, setCamErr] = useState<string | null>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scanningRef = useRef(false);
+
+  const stopCamera = async () => {
+    const s = scannerRef.current;
+    scannerRef.current = null;
+    scanningRef.current = false;
+    if (s) {
+      try { await s.stop(); } catch { /* ignore */ }
+      try { await s.clear(); } catch { /* ignore */ }
+    }
+    setCamOn(false);
+  };
+
+  const handleDetected = async (text: string) => {
+    if (scanningRef.current) return;
+    scanningRef.current = true;
+    setCode(text);
+    await stopCamera();
+    setBusy(true);
+    setActionMsg(null);
+    setShowFull(false);
+    try {
+      const r = (await lookup({ data: { qr_code: text.trim() } })) as LookupResult;
+      setResult(r);
+    } catch (e) {
+      setResult({ ok: false, isAdmin: false, canManage: false, reason: e instanceof Error ? e.message : "Error" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const startCamera = async () => {
+    setCamErr(null);
+    setCamOn(true);
+    // wait for the container div to mount
+    await new Promise((r) => setTimeout(r, 50));
+    try {
+      const el = document.getElementById("qr-reader");
+      if (!el) throw new Error("Camera container missing");
+      const scanner = new Html5Qrcode("qr-reader");
+      scannerRef.current = scanner;
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 240, height: 240 } },
+        (decoded) => { void handleDetected(decoded); },
+        () => { /* ignore per-frame decode errors */ },
+      );
+    } catch (e) {
+      setCamErr(e instanceof Error ? e.message : "Camera unavailable");
+      await stopCamera();
+    }
+  };
+
+  useEffect(() => () => { void stopCamera(); }, []);
 
   const onLookup = async () => {
     if (!code.trim()) return;
