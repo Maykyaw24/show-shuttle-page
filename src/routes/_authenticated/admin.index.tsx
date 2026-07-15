@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -19,7 +19,6 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 const NAV = [
   { label: "Dashboard", to: "/dashboard" },
   { label: "Events", to: "/admin/events" },
-  { label: "Scan", to: "/scan" },
 ];
 
 const ADMIN_BADGE = (
@@ -105,7 +104,6 @@ function AdminHome() {
       <div className="mt-8 flex flex-wrap gap-2">
         <TabBtn active={tab === "queue"} onClick={() => setTab("queue")}>Event moderation</TabBtn>
         <TabBtn active={tab === "orders"} onClick={() => setTab("orders")}>Order review</TabBtn>
-        <Link to="/scan" className="px-4 py-2 rounded-full text-sm border border-border hover:bg-muted">Open scanner →</Link>
       </div>
 
       <div className="mt-4">
