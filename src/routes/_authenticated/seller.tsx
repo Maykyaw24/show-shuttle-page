@@ -13,8 +13,7 @@ export const Route = createFileRoute("/_authenticated/seller")({
 
 const NAV = [
   { label: "Home", to: "/seller" },
-  { label: "My Events", to: "/seller" },
-  { label: "New Event", to: "/sell/new" },
+  { label: "My Events", to: "/seller/events" },
   { label: "Scan", to: "/scan" },
 ];
 
