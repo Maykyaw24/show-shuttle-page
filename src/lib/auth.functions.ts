@@ -153,8 +153,7 @@ export const ensureRoleFromMetadata = createServerFn({ method: "POST" })
     const profile =
       data.role === "buyer"
         ? { id: userId, full_name: data.full_name, phone: data.phone, city: data.city, avatar_url: data.avatar_url ?? null }
-        : data.role === "seller"
-        ? {
+        : {
             id: userId,
             full_name: data.full_name,
             phone: data.phone,
@@ -164,8 +163,7 @@ export const ensureRoleFromMetadata = createServerFn({ method: "POST" })
             seller_type: data.seller_type,
             event_category: data.event_category,
             bio: data.bio ?? null,
-          }
-        : { id: userId, full_name: data.full_name };
+          };
 
     const { error: profileErr } = await context.supabase.from("profiles").upsert(profile as never, { onConflict: "id" });
     if (profileErr) throw new Error(profileErr.message);
