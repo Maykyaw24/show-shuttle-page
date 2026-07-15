@@ -17,9 +17,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 const NAV = [
-  { label: "Home", to: "/admin" },
-  { label: "Moderation", to: "/admin" },
-  { label: "Orders", to: "/admin" },
+  { label: "Dashboard", to: "/dashboard" },
+  { label: "Admin", to: "/admin" },
   { label: "Scan", to: "/scan" },
 ];
 
