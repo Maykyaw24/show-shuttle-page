@@ -23,12 +23,13 @@ const ADMIN_BADGE = (
   </span>
 );
 
-type EventStatus = "pending" | "approved" | "rejected";
+type EventStatus = "pending" | "approved" | "rejected" | "cancelled";
 
 const TABS: { key: EventStatus; label: string; tone: string }[] = [
   { key: "pending",  label: "Pending",  tone: "bg-accent/15 text-accent border-accent/30" },
   { key: "approved", label: "Approved", tone: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
   { key: "rejected", label: "Rejected", tone: "bg-destructive/15 text-destructive border-destructive/30" },
+  { key: "cancelled", label: "Cancelled", tone: "bg-destructive/15 text-destructive border-destructive/30" },
 ];
 
 function AdminEventsPage() {
@@ -47,9 +48,9 @@ function AdminEventsPage() {
   });
 
   const grouped = useMemo(() => {
-    const g: Record<EventStatus, typeof events> = { pending: [], approved: [], rejected: [] } as never;
+    const g: Record<EventStatus, typeof events> = { pending: [], approved: [], rejected: [], cancelled: [] } as never;
     (events ?? []).forEach((e) => {
-      if (e.status === "pending" || e.status === "approved" || e.status === "rejected") {
+      if (e.status === "pending" || e.status === "approved" || e.status === "rejected" || e.status === "cancelled") {
         (g[e.status as EventStatus] as never[]).push(e as never);
       }
     });
@@ -58,7 +59,8 @@ function AdminEventsPage() {
 
   const rows = grouped[tab] ?? [];
 
-  const act = async (id: string, status: "approved" | "rejected") => {
+  const act = async (id: string, status: "approved" | "rejected" | "cancelled") => {
+    if (status === "cancelled" && !confirm("Cancel this event? It will no longer be visible to buyers.")) return;
     try {
       await setStatus({ data: { id, status } });
       toast.success(`Event ${status}`);
@@ -178,6 +180,11 @@ function AdminEventsPage() {
                       {e.status !== "rejected" && (
                         <button onClick={() => act(e.id, "rejected")} className="h-9 px-4 rounded-full bg-destructive/15 text-destructive border border-destructive/30 text-xs">
                           Reject
+                        </button>
+                      )}
+                      {e.status === "approved" && (
+                        <button onClick={() => act(e.id, "cancelled")} className="h-9 px-4 rounded-full bg-muted text-muted-foreground border border-border text-xs hover:bg-destructive/10 hover:text-destructive">
+                          Cancel
                         </button>
                       )}
                     </div>
