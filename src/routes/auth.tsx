@@ -82,7 +82,15 @@ function LoginForm() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = error.message.toLowerCase();
+      if (msg.includes("confirm") || msg.includes("not confirmed")) {
+        toast.message("Please confirm your email to continue.");
+        navigate({ to: "/check-email", search: { email } });
+        return;
+      }
+      return toast.error(error.message);
+    }
     toast.success("Welcome back!");
     navigate({ to: "/dashboard" });
   };
@@ -144,8 +152,8 @@ function SignupForm() {
       });
       if (error) throw error;
       if (!data.session) {
-        toast.success("Check your email to confirm your account, then sign in.");
-        setBusy(false);
+        toast.success("Check your email to confirm your account.");
+        navigate({ to: "/check-email", search: { email } });
         return;
       }
 
