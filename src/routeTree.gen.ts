@@ -21,6 +21,7 @@ import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedBuyerRouteImport } from './routes/_authenticated/buyer'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedSellNewRouteImport } from './routes/_authenticated/sell.new'
@@ -86,6 +87,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBuyerRoute = AuthenticatedBuyerRouteImport.update({
   id: '/buyer',
   path: '/buyer',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/buyer': typeof AuthenticatedBuyerRoute
+  '/chat': typeof AuthenticatedChatRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/scan': typeof AuthenticatedScanRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/buyer': typeof AuthenticatedBuyerRoute
+  '/chat': typeof AuthenticatedChatRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/scan': typeof AuthenticatedScanRoute
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/buyer': typeof AuthenticatedBuyerRoute
+  '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/buyer'
+    | '/chat'
     | '/dashboard'
     | '/my-tickets'
     | '/scan'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/buyer'
+    | '/chat'
     | '/dashboard'
     | '/my-tickets'
     | '/scan'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/reset-password'
     | '/_authenticated/buyer'
+    | '/_authenticated/chat'
     | '/_authenticated/dashboard'
     | '/_authenticated/my-tickets'
     | '/_authenticated/scan'
@@ -325,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/chat': {
+      id: '/_authenticated/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AuthenticatedChatRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/buyer': {
       id: '/_authenticated/buyer'
       path: '/buyer'
@@ -365,6 +384,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBuyerRoute: typeof AuthenticatedBuyerRoute
+  AuthenticatedChatRoute: typeof AuthenticatedChatRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
@@ -377,6 +397,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBuyerRoute: AuthenticatedBuyerRoute,
+  AuthenticatedChatRoute: AuthenticatedChatRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,

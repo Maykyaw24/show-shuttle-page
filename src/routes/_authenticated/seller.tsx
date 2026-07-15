@@ -16,6 +16,7 @@ const NAV = [
   { label: "My Events", to: "/seller" },
   { label: "New Event", to: "/sell/new" },
   { label: "Scan", to: "/scan" },
+  { label: "Assistant", to: "/chat" },
 ];
 
 function SellerHome() {
