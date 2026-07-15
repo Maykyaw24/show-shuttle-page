@@ -51,24 +51,29 @@ export const completeSignup = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Upsert profile
-    const profile: Record<string, unknown> = {
-      id: userId,
-      full_name: data.full_name,
-    };
-    if (data.role === "buyer") {
-      profile.phone = data.phone;
-      profile.city = data.city;
-      profile.avatar_url = data.avatar_url ?? null;
-    } else if (data.role === "seller") {
-      profile.phone = data.phone;
-      profile.city = data.city;
-      profile.avatar_url = data.avatar_url ?? null;
-      profile.organization = data.organization;
-      profile.seller_type = data.seller_type;
-      profile.event_category = data.event_category;
-      profile.bio = data.bio ?? null;
-    }
+    // Build profile row
+    const profile =
+      data.role === "buyer"
+        ? {
+            id: userId,
+            full_name: data.full_name,
+            phone: data.phone,
+            city: data.city,
+            avatar_url: data.avatar_url ?? null,
+          }
+        : data.role === "seller"
+        ? {
+            id: userId,
+            full_name: data.full_name,
+            phone: data.phone,
+            city: data.city,
+            avatar_url: data.avatar_url ?? null,
+            organization: data.organization,
+            seller_type: data.seller_type,
+            event_category: data.event_category,
+            bio: data.bio ?? null,
+          }
+        : { id: userId, full_name: data.full_name };
 
     const { error: profileErr } = await supabaseAdmin
       .from("profiles")
