@@ -12,8 +12,8 @@ export function DashboardShell({
   nav,
   children,
 }: {
-  title: string;
-  subtitle?: string;
+  title: ReactNode;
+  subtitle?: ReactNode;
   badge?: ReactNode;
   nav?: NavItem[];
   children: ReactNode;
