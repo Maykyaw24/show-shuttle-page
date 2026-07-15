@@ -319,8 +319,7 @@ export const adminSetEventStatus = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await requireAdmin(context as never);
-    const patch: Record<string, unknown> = { status: data.status };
-    if (data.status === "rejected") patch.rejection_reason = data.reason ?? "Rejected by admin";
+    const patch = { status: data.status, rejection_reason: data.status === "rejected" ? data.reason ?? "Rejected by admin" : null };
     const { error } = await context.supabase.from("events").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
