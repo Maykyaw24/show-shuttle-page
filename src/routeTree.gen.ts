@@ -25,6 +25,7 @@ import { Route as AuthenticatedBuyerRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedSellNewRouteImport } from './routes/_authenticated/sell.new'
 import { Route as AuthenticatedCheckoutEventIdRouteImport } from './routes/_authenticated/checkout.$eventId'
+import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated/admin.events'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -106,6 +107,12 @@ const AuthenticatedCheckoutEventIdRoute =
     path: '/checkout/$eventId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminEventsRoute =
+  AuthenticatedAdminEventsRouteImport.update({
+    id: '/events',
+    path: '/events',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -114,13 +121,14 @@ export interface FileRoutesByFullPath {
   '/check-email': typeof CheckEmailRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/buyer': typeof AuthenticatedBuyerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/seller': typeof AuthenticatedSellerRoute
   '/events/$id': typeof EventsIdRoute
+  '/admin/events': typeof AuthenticatedAdminEventsRoute
   '/checkout/$eventId': typeof AuthenticatedCheckoutEventIdRoute
   '/sell/new': typeof AuthenticatedSellNewRoute
 }
@@ -131,13 +139,14 @@ export interface FileRoutesByTo {
   '/check-email': typeof CheckEmailRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/buyer': typeof AuthenticatedBuyerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/seller': typeof AuthenticatedSellerRoute
   '/events/$id': typeof EventsIdRoute
+  '/admin/events': typeof AuthenticatedAdminEventsRoute
   '/checkout/$eventId': typeof AuthenticatedCheckoutEventIdRoute
   '/sell/new': typeof AuthenticatedSellNewRoute
 }
@@ -150,13 +159,14 @@ export interface FileRoutesById {
   '/check-email': typeof CheckEmailRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/buyer': typeof AuthenticatedBuyerRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/seller': typeof AuthenticatedSellerRoute
   '/events/$id': typeof EventsIdRoute
+  '/_authenticated/admin/events': typeof AuthenticatedAdminEventsRoute
   '/_authenticated/checkout/$eventId': typeof AuthenticatedCheckoutEventIdRoute
   '/_authenticated/sell/new': typeof AuthenticatedSellNewRoute
 }
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/scan'
     | '/seller'
     | '/events/$id'
+    | '/admin/events'
     | '/checkout/$eventId'
     | '/sell/new'
   fileRoutesByTo: FileRoutesByTo
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/scan'
     | '/seller'
     | '/events/$id'
+    | '/admin/events'
     | '/checkout/$eventId'
     | '/sell/new'
   id:
@@ -211,6 +223,7 @@ export interface FileRouteTypes {
     | '/_authenticated/scan'
     | '/_authenticated/seller'
     | '/events/$id'
+    | '/_authenticated/admin/events'
     | '/_authenticated/checkout/$eventId'
     | '/_authenticated/sell/new'
   fileRoutesById: FileRoutesById
@@ -340,11 +353,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCheckoutEventIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/events': {
+      id: '/_authenticated/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AuthenticatedAdminEventsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminEventsRoute: typeof AuthenticatedAdminEventsRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminEventsRoute: AuthenticatedAdminEventsRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedBuyerRoute: typeof AuthenticatedBuyerRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
@@ -355,7 +386,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedBuyerRoute: AuthenticatedBuyerRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
