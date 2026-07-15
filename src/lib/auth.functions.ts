@@ -37,7 +37,8 @@ export type SignupProfileInput = z.infer<typeof signupSchema>;
 /**
  * Called immediately after supabase.auth.signUp() succeeds on the client.
  * Validates fields server-side, verifies the admin code when role=admin,
- * writes the profile and inserts the user_roles row via service role.
+ * writes the profile and inserts buyer/seller roles through RLS.
+ * Admin roles are created by the signup database trigger after it validates the admin code.
  */
 export const completeSignup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -48,8 +49,6 @@ export const completeSignup = createServerFn({ method: "POST" })
     if (data.role === "admin" && data.admin_code !== ADMIN_CODE) {
       throw new Error("Invalid admin code");
     }
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Build profile row
     const profile =
@@ -75,16 +74,18 @@ export const completeSignup = createServerFn({ method: "POST" })
           }
         : { id: userId, full_name: data.full_name };
 
-    const { error: profileErr } = await supabaseAdmin
+    const { error: profileErr } = await context.supabase
       .from("profiles")
       .upsert(profile as never, { onConflict: "id" });
     if (profileErr) throw new Error(profileErr.message);
 
-    const { error: roleErr } = await supabaseAdmin
-      .from("user_roles")
-      .insert({ user_id: userId, role: data.role });
-    if (roleErr && !roleErr.message.includes("duplicate")) {
-      throw new Error(roleErr.message);
+    if (data.role !== "admin") {
+      const { error: roleErr } = await context.supabase
+        .from("user_roles")
+        .insert({ user_id: userId, role: data.role });
+      if (roleErr && roleErr.code !== "23505" && !roleErr.message.includes("duplicate")) {
+        throw new Error(roleErr.message);
+      }
     }
 
     return { ok: true, role: data.role };
@@ -135,11 +136,8 @@ export const ensureRoleFromMetadata = createServerFn({ method: "POST" })
       .maybeSingle();
     if (existing?.role) return { role: existing.role as "buyer" | "seller" | "admin" };
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: userRes, error: userErr } = await supabaseAdmin.auth.admin.getUserById(userId);
-    if (userErr || !userRes?.user) return { role: null };
-
-    const pending = (userRes.user.user_metadata ?? {}).pending_signup;
+    const claims = context.claims as { user_metadata?: { pending_signup?: unknown } };
+    const pending = claims.user_metadata?.pending_signup;
     const parsed = signupSchema.safeParse(pending);
     if (!parsed.success) return { role: null };
     const data = parsed.data;
@@ -148,11 +146,14 @@ export const ensureRoleFromMetadata = createServerFn({ method: "POST" })
       return { role: null };
     }
 
+    if (data.role === "admin") {
+      return { role: null };
+    }
+
     const profile =
       data.role === "buyer"
         ? { id: userId, full_name: data.full_name, phone: data.phone, city: data.city, avatar_url: data.avatar_url ?? null }
-        : data.role === "seller"
-        ? {
+        : {
             id: userId,
             full_name: data.full_name,
             phone: data.phone,
@@ -162,16 +163,15 @@ export const ensureRoleFromMetadata = createServerFn({ method: "POST" })
             seller_type: data.seller_type,
             event_category: data.event_category,
             bio: data.bio ?? null,
-          }
-        : { id: userId, full_name: data.full_name };
+          };
 
-    await supabaseAdmin.from("profiles").upsert(profile as never, { onConflict: "id" });
-    await supabaseAdmin.from("user_roles").insert({ user_id: userId, role: data.role });
+    const { error: profileErr } = await context.supabase.from("profiles").upsert(profile as never, { onConflict: "id" });
+    if (profileErr) throw new Error(profileErr.message);
 
-    // Clear the pending payload so we don't re-run this.
-    await supabaseAdmin.auth.admin.updateUserById(userId, {
-      user_metadata: { ...userRes.user.user_metadata, pending_signup: null },
-    });
+    const { error: roleErr } = await context.supabase.from("user_roles").insert({ user_id: userId, role: data.role });
+    if (roleErr && roleErr.code !== "23505" && !roleErr.message.includes("duplicate")) {
+      throw new Error(roleErr.message);
+    }
 
     return { role: data.role };
   });

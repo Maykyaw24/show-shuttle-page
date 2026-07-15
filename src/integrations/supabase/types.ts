@@ -296,13 +296,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      claim_signup_role: {
-        Args: {
-          _admin_code?: string
-          _role: Database["public"]["Enums"]["app_role"]
-        }
-        Returns: Database["public"]["Enums"]["app_role"]
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
