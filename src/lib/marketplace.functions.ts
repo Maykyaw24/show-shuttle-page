@@ -344,9 +344,8 @@ export const adminConfirmOrder = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ order_id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     await requireAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: order, error: oErr } = await supabaseAdmin
+    const { data: order, error: oErr } = await context.supabase
       .from("orders")
       .select("*")
       .eq("id", data.order_id)
@@ -362,24 +361,29 @@ export const adminConfirmOrder = createServerFn({ method: "POST" })
       qr_code: `LB-${order.id.slice(0, 8)}-${crypto.randomUUID().slice(0, 12)}`,
       status: "valid" as const,
     }));
-    const { error: tErr } = await supabaseAdmin.from("tickets").insert(tickets);
+    const { error: tErr } = await context.supabase.from("tickets").insert(tickets);
     if (tErr) throw new Error(tErr.message);
 
-    await supabaseAdmin.from("orders").update({ status: "confirmed" }).eq("id", order.id);
+    const { error: orderUpdateErr } = await context.supabase.from("orders").update({ status: "confirmed" }).eq("id", order.id);
+    if (orderUpdateErr) throw new Error(orderUpdateErr.message);
+
     // Increment tickets_sold on event
-    const { data: currentEv } = await supabaseAdmin.from("events").select("tickets_sold").eq("id", order.event_id).single();
+    const { data: currentEv, error: eventFetchErr } = await context.supabase.from("events").select("tickets_sold").eq("id", order.event_id).single();
+    if (eventFetchErr) throw new Error(eventFetchErr.message);
     if (currentEv) {
-      await supabaseAdmin
+      const { error: eventUpdateErr } = await context.supabase
         .from("events")
         .update({ tickets_sold: currentEv.tickets_sold + order.quantity })
         .eq("id", order.event_id);
+      if (eventUpdateErr) throw new Error(eventUpdateErr.message);
     }
 
-    await supabaseAdmin.from("notifications").insert({
+    const { error: notificationErr } = await context.supabase.from("notifications").insert({
       user_id: order.buyer_id,
       title: "Tickets confirmed 🎫",
       body: `Your order is confirmed. ${order.quantity} ticket(s) issued with QR codes.`,
     });
+    if (notificationErr) throw new Error(notificationErr.message);
 
     return { ok: true };
   });
@@ -417,7 +421,10 @@ export const scanTicket = createServerFn({ method: "POST" })
     if (ticket.status === "used") return { ok: false, reason: "Ticket already used", ticket };
     if (ticket.status !== "valid") return { ok: false, reason: `Ticket status: ${ticket.status}`, ticket };
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("tickets").update({ status: "used", used_at: new Date().toISOString() }).eq("id", ticket.id);
+    const { error: updateErr } = await context.supabase
+      .from("tickets")
+      .update({ status: "used", used_at: new Date().toISOString() })
+      .eq("id", ticket.id);
+    if (updateErr) throw new Error(updateErr.message);
     return { ok: true, ticket };
   });
