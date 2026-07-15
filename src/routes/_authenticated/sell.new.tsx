@@ -233,8 +233,26 @@ function NewEvent() {
         </div>
       )}
 
-      <style>{`.input{height:44px;border-radius:9999px;background:hsl(var(--input));padding:0 1.25rem;font-size:.875rem;outline:none;width:100%}
-      textarea.input{border-radius:1rem;padding:.75rem 1rem;height:auto}`}</style>
+      <style>{`
+        .input{height:44px;border-radius:9999px;background:var(--color-input);color:var(--color-foreground);padding:0 1.25rem;font-size:.875rem;outline:none;width:100%;border:1px solid oklch(0.35 0.04 75 / 0.35);transition:border-color .15s, box-shadow .15s, background .15s}
+        .input:hover{border-color:oklch(0.55 0.08 75 / 0.5)}
+        .input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px oklch(0.82 0.15 82 / 0.18)}
+        textarea.input{border-radius:1rem;padding:.85rem 1.1rem;height:auto;line-height:1.55}
+        .select-input{appearance:none;-webkit-appearance:none;background-image:none;cursor:pointer}
+        .select-input option{background:var(--color-card);color:var(--color-foreground)}
+      `}</style>
+    </div>
+  );
+}
+
+function SectionHeader({ step, title, hint }: { step: string; title: string; hint: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="grid place-items-center h-7 w-7 rounded-full bg-gradient-gold text-primary-foreground text-xs font-black shadow-gold">{step}</span>
+      <div>
+        <div className="font-semibold text-sm">{title}</div>
+        <div className="text-xs text-muted-foreground">{hint}</div>
+      </div>
     </div>
   );
 }
@@ -242,8 +260,8 @@ function NewEvent() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <div className="mt-1">{children}</div>
+      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
+      <div className="mt-1.5">{children}</div>
     </label>
   );
 }
