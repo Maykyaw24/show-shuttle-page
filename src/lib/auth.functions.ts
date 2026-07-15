@@ -77,7 +77,7 @@ export const completeSignup = createServerFn({ method: "POST" })
 
     const { error: profileErr } = await supabaseAdmin
       .from("profiles")
-      .upsert(profile, { onConflict: "id" });
+      .upsert(profile as never, { onConflict: "id" });
     if (profileErr) throw new Error(profileErr.message);
 
     const { error: roleErr } = await supabaseAdmin
