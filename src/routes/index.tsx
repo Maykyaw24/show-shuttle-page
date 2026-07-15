@@ -63,7 +63,7 @@ function Header({ onLogin, onSell }: { onLogin: () => void; onSell: () => void }
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
         <a href="#" className="flex items-center gap-2 group">
           <div className="w-9 h-9 rounded-lg bg-gradient-gold flex items-center justify-center shadow-gold">
-            <span className="text-primary-foreground font-bold text-lg">T</span>
+            <span className="text-primary-foreground font-bold text-lg">L</span>
           </div>
           <span className="font-display text-xl tracking-wide">Live<span className="text-gradient-gold">Beat</span></span>
         </a>
@@ -407,7 +407,7 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-10">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-gold flex items-center justify-center text-primary-foreground font-bold">T</div>
+            <div className="w-8 h-8 rounded-lg bg-gradient-gold flex items-center justify-center text-primary-foreground font-bold">L</div>
             <span className="font-display text-lg">Live<span className="text-gradient-gold">Beat</span></span>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">Premium tickets to the world's most unforgettable nights.</p>
