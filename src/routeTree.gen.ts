@@ -16,10 +16,15 @@ import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EventsIdRouteImport } from './routes/events.$id'
 import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
+import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
+import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBuyerRouteImport } from './routes/_authenticated/buyer'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedSellNewRouteImport } from './routes/_authenticated/sell.new'
+import { Route as AuthenticatedCheckoutEventIdRouteImport } from './routes/_authenticated/checkout.$eventId'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -55,9 +60,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsIdRoute = EventsIdRouteImport.update({
+  id: '/events/$id',
+  path: '/events/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedSellerRoute = AuthenticatedSellerRouteImport.update({
   id: '/seller',
   path: '/seller',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMyTicketsRoute = AuthenticatedMyTicketsRouteImport.update({
+  id: '/my-tickets',
+  path: '/my-tickets',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -75,6 +95,17 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSellNewRoute = AuthenticatedSellNewRouteImport.update({
+  id: '/sell/new',
+  path: '/sell/new',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCheckoutEventIdRoute =
+  AuthenticatedCheckoutEventIdRouteImport.update({
+    id: '/checkout/$eventId',
+    path: '/checkout/$eventId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -86,7 +117,12 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/buyer': typeof AuthenticatedBuyerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/scan': typeof AuthenticatedScanRoute
   '/seller': typeof AuthenticatedSellerRoute
+  '/events/$id': typeof EventsIdRoute
+  '/checkout/$eventId': typeof AuthenticatedCheckoutEventIdRoute
+  '/sell/new': typeof AuthenticatedSellNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -98,7 +134,12 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/buyer': typeof AuthenticatedBuyerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/scan': typeof AuthenticatedScanRoute
   '/seller': typeof AuthenticatedSellerRoute
+  '/events/$id': typeof EventsIdRoute
+  '/checkout/$eventId': typeof AuthenticatedCheckoutEventIdRoute
+  '/sell/new': typeof AuthenticatedSellNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -112,7 +153,12 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/buyer': typeof AuthenticatedBuyerRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/seller': typeof AuthenticatedSellerRoute
+  '/events/$id': typeof EventsIdRoute
+  '/_authenticated/checkout/$eventId': typeof AuthenticatedCheckoutEventIdRoute
+  '/_authenticated/sell/new': typeof AuthenticatedSellNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -126,7 +172,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/buyer'
     | '/dashboard'
+    | '/my-tickets'
+    | '/scan'
     | '/seller'
+    | '/events/$id'
+    | '/checkout/$eventId'
+    | '/sell/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -138,7 +189,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/buyer'
     | '/dashboard'
+    | '/my-tickets'
+    | '/scan'
     | '/seller'
+    | '/events/$id'
+    | '/checkout/$eventId'
+    | '/sell/new'
   id:
     | '__root__'
     | '/'
@@ -151,7 +207,12 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/buyer'
     | '/_authenticated/dashboard'
+    | '/_authenticated/my-tickets'
+    | '/_authenticated/scan'
     | '/_authenticated/seller'
+    | '/events/$id'
+    | '/_authenticated/checkout/$eventId'
+    | '/_authenticated/sell/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -162,6 +223,7 @@ export interface RootRouteChildren {
   CheckEmailRoute: typeof CheckEmailRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  EventsIdRoute: typeof EventsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -215,11 +277,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events/$id': {
+      id: '/events/$id'
+      path: '/events/$id'
+      fullPath: '/events/$id'
+      preLoaderRoute: typeof EventsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/seller': {
       id: '/_authenticated/seller'
       path: '/seller'
       fullPath: '/seller'
       preLoaderRoute: typeof AuthenticatedSellerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/scan': {
+      id: '/_authenticated/scan'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof AuthenticatedScanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-tickets': {
+      id: '/_authenticated/my-tickets'
+      path: '/my-tickets'
+      fullPath: '/my-tickets'
+      preLoaderRoute: typeof AuthenticatedMyTicketsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -243,6 +326,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sell/new': {
+      id: '/_authenticated/sell/new'
+      path: '/sell/new'
+      fullPath: '/sell/new'
+      preLoaderRoute: typeof AuthenticatedSellNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/checkout/$eventId': {
+      id: '/_authenticated/checkout/$eventId'
+      path: '/checkout/$eventId'
+      fullPath: '/checkout/$eventId'
+      preLoaderRoute: typeof AuthenticatedCheckoutEventIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -250,14 +347,22 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedBuyerRoute: typeof AuthenticatedBuyerRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
+  AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSellerRoute: typeof AuthenticatedSellerRoute
+  AuthenticatedCheckoutEventIdRoute: typeof AuthenticatedCheckoutEventIdRoute
+  AuthenticatedSellNewRoute: typeof AuthenticatedSellNewRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedBuyerRoute: AuthenticatedBuyerRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
+  AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSellerRoute: AuthenticatedSellerRoute,
+  AuthenticatedCheckoutEventIdRoute: AuthenticatedCheckoutEventIdRoute,
+  AuthenticatedSellNewRoute: AuthenticatedSellNewRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -271,6 +376,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckEmailRoute: CheckEmailRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  EventsIdRoute: EventsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

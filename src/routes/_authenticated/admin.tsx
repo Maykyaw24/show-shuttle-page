@@ -1,107 +1,121 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { DashboardShell, SectionCard, StatCard, StatusBadge } from "@/components/dashboard-shell";
+import {
+  adminListPendingEvents, adminSetEventStatus,
+  adminListOrders, adminConfirmOrder, adminRejectOrder,
+} from "@/lib/marketplace.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  head: () => ({
-    meta: [
-      { title: "Admin console — LiveBeat" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "Admin console — LiveBeat" }, { name: "robots", content: "noindex" }] }),
   component: AdminHome,
 });
 
 const NAV = [
   { label: "Home", to: "/admin" },
   { label: "Moderation", to: "/admin" },
-  { label: "Dashboard", to: "/dashboard" },
-  { label: "Users", to: "/admin" },
-  { label: "Profile", to: "/admin" },
+  { label: "Orders", to: "/admin" },
+  { label: "Scan", to: "/scan" },
 ];
 
-const QUEUE = [
-  { id: "EVT-3391", title: "Underground Techno Night", seller: "Nocturne Events", city: "Bengaluru", date: "Aug 25, 2026", status: "Pending review" },
-  { id: "EVT-3388", title: "Sufi Soul Sessions", seller: "Rooh Productions", city: "Jaipur", date: "Sep 02, 2026", status: "Pending review" },
-  { id: "EVT-3382", title: "Metal Mayhem Vol. 5", seller: "Loudwire Live", city: "Pune", date: "Sep 14, 2026", status: "Pending review" },
-];
-
-const CHECKINS = [
-  { id: "CHK-441", event: "Coldplay — Music of the Spheres", scanned: 42130, capacity: 55000, gate: "Gate 4", status: "Active" },
-  { id: "CHK-440", event: "Divine Live", scanned: 3820, capacity: 4000, gate: "Main", status: "Closed" },
-];
-
-const USERS = [
-  { name: "Aisha Khan", email: "aisha@buyer.com", role: "buyer", joined: "Jul 12, 2026", status: "Active" },
-  { name: "Rooh Productions", email: "hi@rooh.in", role: "seller", joined: "Jun 04, 2026", status: "Active" },
-  { name: "Kabir Mehra", email: "kabir@x.com", role: "buyer", joined: "Aug 01, 2026", status: "Suspicious" },
-  { name: "Loudwire Live", email: "book@loudwire.in", role: "seller", joined: "Mar 22, 2026", status: "Active" },
-];
-
-const RISKS = [
-  { id: "RSK-9001", label: "Unverified seller with 3 pending listings", severity: "High" },
-  { id: "RSK-9002", label: "Duplicate event title flagged by system", severity: "Medium" },
-  { id: "RSK-9003", label: "Ticket price 5× market average", severity: "Medium" },
-];
+const trustColor = (l?: string | null) =>
+  l === "trusted" ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10"
+  : l === "suspicious" ? "text-destructive border-destructive/30 bg-destructive/10"
+  : "text-amber-300 border-amber-500/30 bg-amber-500/10";
 
 function AdminHome() {
-  const [tab, setTab] = useState<"queue" | "checkin" | "users">("queue");
+  const [tab, setTab] = useState<"queue" | "orders">("queue");
+  const listEvents = useServerFn(adminListPendingEvents);
+  const setStatus = useServerFn(adminSetEventStatus);
+  const listOrders = useServerFn(adminListOrders);
+  const confirmOrder = useServerFn(adminConfirmOrder);
+  const rejectOrder = useServerFn(adminRejectOrder);
+  const qc = useQueryClient();
+
+  const { data: events } = useQuery({ queryKey: ["admin", "events"], queryFn: () => listEvents() });
+  const { data: orders } = useQuery({ queryKey: ["admin", "orders"], queryFn: () => listOrders() });
+
+  const pending = events?.filter((e) => e.status === "pending").length ?? 0;
+  const approved = events?.filter((e) => e.status === "approved").length ?? 0;
+  const awaiting = orders?.filter((o) => o.status === "awaiting_review").length ?? 0;
+  const confirmed = orders?.filter((o) => o.status === "confirmed").length ?? 0;
+
+  const act = async (id: string, status: "approved" | "rejected") => {
+    try {
+      await setStatus({ data: { id, status } });
+      toast.success(`Event ${status}`);
+      qc.invalidateQueries({ queryKey: ["admin", "events"] });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+  };
+
+  const doConfirm = async (id: string) => {
+    try {
+      await confirmOrder({ data: { order_id: id } });
+      toast.success("Order confirmed. Tickets issued.");
+      qc.invalidateQueries({ queryKey: ["admin", "orders"] });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+  };
+
+  const doReject = async (id: string) => {
+    try {
+      await rejectOrder({ data: { order_id: id } });
+      toast.success("Order rejected");
+      qc.invalidateQueries({ queryKey: ["admin", "orders"] });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+  };
 
   return (
     <DashboardShell
       title="Admin console"
-      subtitle="Moderate events, manage check-ins, and keep LiveBeat trusted."
-      badge={
-        <span className="text-xs px-3 py-1 rounded-full bg-destructive/15 text-destructive border border-destructive/30 uppercase tracking-wide">
-          Admin
-        </span>
-      }
+      subtitle="Moderate events, approve payments, and issue tickets."
+      badge={<span className="text-xs px-3 py-1 rounded-full bg-destructive/15 text-destructive border border-destructive/30 uppercase tracking-wide">Admin</span>}
       nav={NAV}
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label="Pending events" value={14} hint="Needs review" tone="warn" />
-        <StatCard label="Approved events" value={287} hint="+9 this week" tone="success" />
-        <StatCard label="Reported listings" value={3} hint="Awaiting action" tone="danger" />
-        <StatCard label="Active users" value="12,480" hint="+412 this month" tone="gold" />
+        <StatCard label="Pending events" value={pending} hint="Needs review" tone="warn" />
+        <StatCard label="Approved events" value={approved} tone="success" />
+        <StatCard label="Payments awaiting review" value={awaiting} tone="warn" />
+        <StatCard label="Confirmed orders" value={confirmed} tone="gold" />
       </div>
 
       <div className="mt-8 flex flex-wrap gap-2">
-        <TabBtn active={tab === "queue"} onClick={() => setTab("queue")}>Moderation queue</TabBtn>
-        <TabBtn active={tab === "checkin"} onClick={() => setTab("checkin")}>QR check-ins</TabBtn>
-        <TabBtn active={tab === "users"} onClick={() => setTab("users")}>User management</TabBtn>
+        <TabBtn active={tab === "queue"} onClick={() => setTab("queue")}>Event moderation</TabBtn>
+        <TabBtn active={tab === "orders"} onClick={() => setTab("orders")}>Order review</TabBtn>
+        <Link to="/scan" className="px-4 py-2 rounded-full text-sm border border-border hover:bg-muted">Open scanner →</Link>
       </div>
 
       <div className="mt-4">
         {tab === "queue" && (
-          <SectionCard
-            title="🛡️ Moderation queue"
-            action={
-              <div className="flex gap-2">
-                <select className="h-9 rounded-full bg-input px-3 text-xs">
-                  <option>All cities</option><option>Mumbai</option><option>Delhi</option><option>Pune</option>
-                </select>
-                <select className="h-9 rounded-full bg-input px-3 text-xs">
-                  <option>Newest first</option><option>Oldest first</option>
-                </select>
-              </div>
-            }
-          >
+          <SectionCard title="🛡️ Moderation queue">
             <div className="space-y-3">
-              {QUEUE.map((q) => (
-                <div key={q.id} className="rounded-xl border border-border/60 p-4 flex flex-col md:flex-row md:items-center gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium">{q.title}</span>
-                      <StatusBadge status={q.status} />
+              {events && events.length === 0 && <div className="text-sm text-muted-foreground">No events yet.</div>}
+              {events?.map((e) => (
+                <div key={e.id} className="rounded-xl border border-border/60 p-4">
+                  <div className="flex flex-col md:flex-row md:items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium">{e.title}</span>
+                        <StatusBadge status={e.status} />
+                        {e.trust_level && (
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full border uppercase ${trustColor(e.trust_level)}`}>
+                            AI: {e.trust_level.replace("_", " ")}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {e.artist} · {e.venue}, {e.city} · {new Date(e.event_date).toLocaleDateString()} · ₹{Number(e.price).toLocaleString()} × {e.ticket_count}
+                      </div>
+                      {e.trust_reason && <div className="text-xs text-muted-foreground mt-1 italic">🤖 {e.trust_reason}</div>}
                     </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {q.id} · {q.seller} · {q.city} · {q.date}
-                    </div>
-                  </div>
-                  <div className="flex gap-2 flex-wrap">
-                    <button className="h-9 px-4 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs">Approve</button>
-                    <button className="h-9 px-4 rounded-full bg-accent/15 text-accent border border-accent/30 text-xs">Request changes</button>
-                    <button className="h-9 px-4 rounded-full bg-destructive/15 text-destructive border border-destructive/30 text-xs">Reject</button>
+                    {e.status === "pending" && (
+                      <div className="flex gap-2">
+                        <button onClick={() => act(e.id, "approved")} className="h-9 px-4 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs">Approve</button>
+                        <button onClick={() => act(e.id, "rejected")} className="h-9 px-4 rounded-full bg-destructive/15 text-destructive border border-destructive/30 text-xs">Reject</button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -109,88 +123,39 @@ function AdminHome() {
           </SectionCard>
         )}
 
-        {tab === "checkin" && (
-          <SectionCard title="🔲 QR check-in management">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-xs uppercase text-muted-foreground">
-                  <tr>
-                    <th className="text-left px-2 py-2">Event</th>
-                    <th className="text-left px-2 py-2">Gate</th>
-                    <th className="text-left px-2 py-2">Scanned</th>
-                    <th className="text-left px-2 py-2">Status</th>
-                    <th className="text-left px-2 py-2"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  {CHECKINS.map((c) => (
-                    <tr key={c.id}>
-                      <td className="px-2 py-3 font-medium">{c.event}</td>
-                      <td className="px-2 py-3 text-muted-foreground">{c.gate}</td>
-                      <td className="px-2 py-3">{c.scanned.toLocaleString()} / {c.capacity.toLocaleString()}</td>
-                      <td className="px-2 py-3"><StatusBadge status={c.status} /></td>
-                      <td className="px-2 py-3 text-right">
-                        <button className="h-8 px-3 rounded-full border border-border text-xs hover:bg-muted">Open</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {tab === "orders" && (
+          <SectionCard title="💳 Order review">
+            <div className="space-y-3">
+              {orders && orders.length === 0 && <div className="text-sm text-muted-foreground">No orders yet.</div>}
+              {orders?.map((o) => (
+                <div key={o.id} className="rounded-xl border border-border/60 p-4">
+                  <div className="flex flex-col md:flex-row md:items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium">{(o as { events?: { title?: string } }).events?.title ?? "Event"}</span>
+                        <StatusBadge status={o.status} />
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Order #{o.id.slice(0, 8)} · {o.quantity} ticket(s) · ₹{Number(o.total_price).toLocaleString()}
+                      </div>
+                      {o.payment_proof_url && (
+                        <a href={o.payment_proof_url} target="_blank" rel="noreferrer" className="mt-2 inline-block">
+                          <img src={o.payment_proof_url} alt="proof" className="max-h-24 rounded-lg border border-border/60" />
+                        </a>
+                      )}
+                    </div>
+                    {o.status === "awaiting_review" && (
+                      <div className="flex gap-2">
+                        <button onClick={() => doConfirm(o.id)} className="h-9 px-4 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs">Mark paid & issue tickets</button>
+                        <button onClick={() => doReject(o.id)} className="h-9 px-4 rounded-full bg-destructive/15 text-destructive border border-destructive/30 text-xs">Reject</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </SectionCard>
         )}
-
-        {tab === "users" && (
-          <SectionCard
-            title="👥 User management"
-            action={
-              <input placeholder="Search users…" className="h-9 rounded-full bg-input px-4 text-xs w-56" />
-            }
-          >
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-xs uppercase text-muted-foreground">
-                  <tr>
-                    <th className="text-left px-2 py-2">Name</th>
-                    <th className="text-left px-2 py-2 hidden md:table-cell">Email</th>
-                    <th className="text-left px-2 py-2">Role</th>
-                    <th className="text-left px-2 py-2 hidden md:table-cell">Joined</th>
-                    <th className="text-left px-2 py-2">Status</th>
-                    <th className="text-left px-2 py-2"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  {USERS.map((u) => (
-                    <tr key={u.email}>
-                      <td className="px-2 py-3 font-medium">{u.name}</td>
-                      <td className="px-2 py-3 hidden md:table-cell text-muted-foreground">{u.email}</td>
-                      <td className="px-2 py-3 capitalize">{u.role}</td>
-                      <td className="px-2 py-3 hidden md:table-cell text-muted-foreground">{u.joined}</td>
-                      <td className="px-2 py-3"><StatusBadge status={u.status} /></td>
-                      <td className="px-2 py-3 text-right">
-                        <button className="h-8 px-3 rounded-full border border-border text-xs hover:bg-muted">Manage</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </SectionCard>
-        )}
-      </div>
-
-      <div className="mt-6">
-        <SectionCard title="⚠️ Trust & safety">
-          <div className="grid gap-3 md:grid-cols-3">
-            {RISKS.map((r) => (
-              <div key={r.id} className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
-                <div className="text-xs uppercase text-destructive">{r.severity} risk</div>
-                <div className="mt-1 text-sm">{r.label}</div>
-                <div className="text-[11px] text-muted-foreground mt-2">{r.id}</div>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
       </div>
     </DashboardShell>
   );
@@ -198,14 +163,7 @@ function AdminHome() {
 
 function TabBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button
-      onClick={onClick}
-      className={`px-4 py-2 rounded-full text-sm border transition ${
-        active
-          ? "bg-primary text-primary-foreground border-primary shadow-gold"
-          : "border-border hover:bg-muted"
-      }`}
-    >
+    <button onClick={onClick} className={`px-4 py-2 rounded-full text-sm border transition ${active ? "bg-primary text-primary-foreground border-primary shadow-gold" : "border-border hover:bg-muted"}`}>
       {children}
     </button>
   );
