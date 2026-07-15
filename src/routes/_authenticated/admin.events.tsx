@@ -59,7 +59,8 @@ function AdminEventsPage() {
 
   const rows = grouped[tab] ?? [];
 
-  const act = async (id: string, status: "approved" | "rejected") => {
+  const act = async (id: string, status: "approved" | "rejected" | "cancelled") => {
+    if (status === "cancelled" && !confirm("Cancel this event? It will no longer be visible to buyers.")) return;
     try {
       await setStatus({ data: { id, status } });
       toast.success(`Event ${status}`);
