@@ -72,6 +72,17 @@ function AdminHome() {
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
   };
 
+  const runTrust = async (id: string) => {
+    setCheckingId(id);
+    try {
+      const res = await checkTrust({ data: { id } });
+      toast.success(`AI verdict: ${res.level.replace("_", " ")}`);
+      qc.invalidateQueries({ queryKey: ["admin", "events"] });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "AI check failed"); }
+    finally { setCheckingId(null); }
+  };
+
+
   return (
     <DashboardShell
       title="Admin console"
