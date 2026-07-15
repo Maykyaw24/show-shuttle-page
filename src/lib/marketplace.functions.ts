@@ -366,12 +366,14 @@ export const adminConfirmOrder = createServerFn({ method: "POST" })
     if (tErr) throw new Error(tErr.message);
 
     await supabaseAdmin.from("orders").update({ status: "confirmed" }).eq("id", order.id);
-    await supabaseAdmin.rpc("increment_tickets_sold" as never, {} as never).then(() => undefined).catch(() => undefined);
-    // Fallback increment via update
-    await supabaseAdmin
-      .from("events")
-      .update({ tickets_sold: (await supabaseAdmin.from("events").select("tickets_sold").eq("id", order.event_id).single()).data!.tickets_sold + order.quantity })
-      .eq("id", order.event_id);
+    // Increment tickets_sold on event
+    const { data: currentEv } = await supabaseAdmin.from("events").select("tickets_sold").eq("id", order.event_id).single();
+    if (currentEv) {
+      await supabaseAdmin
+        .from("events")
+        .update({ tickets_sold: currentEv.tickets_sold + order.quantity })
+        .eq("id", order.event_id);
+    }
 
     await supabaseAdmin.from("notifications").insert({
       user_id: order.buyer_id,
