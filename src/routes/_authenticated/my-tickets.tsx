@@ -77,7 +77,7 @@ function MyTickets() {
               <div key={o.id} className="p-4 flex items-center justify-between gap-4 text-sm">
                 <div className="min-w-0">
                   <div className="font-medium truncate">{(o as { events?: { title?: string } }).events?.title ?? "Event"}</div>
-                  <div className="text-xs text-muted-foreground">Order #{o.id.slice(0, 8)} · {o.quantity} ticket(s) · ₹{Number(o.total_price).toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">Order #{o.id.slice(0, 8)} · {o.quantity} ticket(s) · MMK {Number(o.total_price).toLocaleString()}</div>
                 </div>
                 <span className="text-[10px] uppercase px-2 py-1 rounded-full border border-border">{o.status}</span>
               </div>

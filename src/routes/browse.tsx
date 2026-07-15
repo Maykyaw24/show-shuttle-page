@@ -134,7 +134,7 @@ function BrowsePage() {
                   </div>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="text-xs text-muted-foreground">{new Date(e.event_date).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</div>
-                    <div className="text-lg font-black text-gradient-gold">₹{Number(e.price).toLocaleString()}</div>
+                    <div className="text-lg font-black text-gradient-gold">MMK {Number(e.price).toLocaleString()}</div>
                   </div>
                   {!soldOut && (
                     <div className="mt-2 text-[11px] text-muted-foreground">{remaining} of {e.ticket_count} tickets left</div>

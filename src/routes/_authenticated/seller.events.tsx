@@ -106,7 +106,7 @@ function SellerEvents() {
                             <Field label="Category" value={e.category} />
                             <Field label="Venue" value={`${e.venue}, ${e.city}`} />
                             <Field label="Date" value={new Date(e.event_date).toLocaleString()} />
-                            <Field label="Price" value={`₹${Number(e.price).toLocaleString()}`} />
+                            <Field label="Price" value={`MMK ${Number(e.price).toLocaleString()}`} />
                             <Field label="Tickets" value={`${e.tickets_sold}/${e.ticket_count} sold`} />
                             <Field label="Status" value={e.status} />
                             {e.trust_level && <Field label="AI verdict" value={e.trust_level.replace("_", " ")} />}

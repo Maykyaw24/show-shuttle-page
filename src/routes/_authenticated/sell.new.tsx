@@ -129,7 +129,7 @@ function NewEvent() {
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <Field label="Date & time"><input required type="datetime-local" value={form.event_date} onChange={(e) => set("event_date", e.target.value)} className="input" /></Field>
-            <Field label="Price (₹)"><input required type="number" min="0" step="0.01" value={form.price} onChange={(e) => set("price", e.target.value)} className="input" /></Field>
+            <Field label="Price (MMK )"><input required type="number" min="0" step="0.01" value={form.price} onChange={(e) => set("price", e.target.value)} className="input" /></Field>
             <Field label="Ticket count"><input required type="number" min="1" value={form.ticket_count} onChange={(e) => set("ticket_count", e.target.value)} className="input" /></Field>
           </div>
           <div>
@@ -165,7 +165,7 @@ function NewEvent() {
 
             {!aiDraft ? (
               <div className="grid gap-3">
-                <p className="text-sm text-muted-foreground">Using: <b>{form.artist || "?"}</b> · {form.venue || "?"}, {form.city || "?"} · {form.event_date || "?"} · ₹{form.price || "?"} · {form.category}</p>
+                <p className="text-sm text-muted-foreground">Using: <b>{form.artist || "?"}</b> · {form.venue || "?"}, {form.city || "?"} · {form.event_date || "?"} · MMK {form.price || "?"} · {form.category}</p>
                 <Field label="Vibe / mood (optional)">
                   <input value={aiVibe} onChange={(e) => setAiVibe(e.target.value)} placeholder="e.g. energetic, intimate acoustic, festival-style" className="input" />
                 </Field>
