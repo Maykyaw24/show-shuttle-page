@@ -182,6 +182,11 @@ function AdminEventsPage() {
                           Reject
                         </button>
                       )}
+                      {e.status === "approved" && (
+                        <button onClick={() => act(e.id, "cancelled")} className="h-9 px-4 rounded-full bg-muted text-muted-foreground border border-border text-xs hover:bg-destructive/10 hover:text-destructive">
+                          Cancel
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
