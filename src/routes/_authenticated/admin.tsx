@@ -126,12 +126,22 @@ function AdminHome() {
                       </div>
                       {e.trust_reason && <div className="text-xs text-muted-foreground mt-1 italic">🤖 {e.trust_reason}</div>}
                     </div>
-                    {e.status === "pending" && (
-                      <div className="flex gap-2">
-                        <button onClick={() => act(e.id, "approved")} className="h-9 px-4 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs">Approve</button>
-                        <button onClick={() => act(e.id, "rejected")} className="h-9 px-4 rounded-full bg-destructive/15 text-destructive border border-destructive/30 text-xs">Reject</button>
-                      </div>
-                    )}
+                    <div className="flex gap-2 flex-wrap">
+                      <button
+                        onClick={() => runTrust(e.id)}
+                        disabled={checkingId === e.id}
+                        className="h-9 px-4 rounded-full bg-primary/15 text-primary border border-primary/30 text-xs disabled:opacity-50"
+                      >
+                        {checkingId === e.id ? "Checking…" : e.trust_level ? "Re-check with AI" : "Check with AI"}
+                      </button>
+                      {e.status === "pending" && (
+                        <>
+                          <button onClick={() => act(e.id, "approved")} className="h-9 px-4 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs">Approve</button>
+                          <button onClick={() => act(e.id, "rejected")} className="h-9 px-4 rounded-full bg-destructive/15 text-destructive border border-destructive/30 text-xs">Reject</button>
+                        </>
+                      )}
+                    </div>
+
                   </div>
                 </div>
               ))}
