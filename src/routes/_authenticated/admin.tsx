@@ -6,8 +6,10 @@ import { DashboardShell, SectionCard, StatCard, StatusBadge } from "@/components
 import {
   adminListPendingEvents, adminSetEventStatus,
   adminListOrders, adminConfirmOrder, adminRejectOrder,
+  adminCheckEventTrust,
 } from "@/lib/marketplace.functions";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin console — LiveBeat" }, { name: "robots", content: "noindex" }] }),
@@ -28,12 +30,15 @@ const trustColor = (l?: string | null) =>
 
 function AdminHome() {
   const [tab, setTab] = useState<"queue" | "orders">("queue");
+  const [checkingId, setCheckingId] = useState<string | null>(null);
   const listEvents = useServerFn(adminListPendingEvents);
   const setStatus = useServerFn(adminSetEventStatus);
   const listOrders = useServerFn(adminListOrders);
   const confirmOrder = useServerFn(adminConfirmOrder);
   const rejectOrder = useServerFn(adminRejectOrder);
+  const checkTrust = useServerFn(adminCheckEventTrust);
   const qc = useQueryClient();
+
 
   const { data: events } = useQuery({ queryKey: ["admin", "events"], queryFn: () => listEvents() });
   const { data: orders } = useQuery({ queryKey: ["admin", "orders"], queryFn: () => listOrders() });
@@ -66,6 +71,17 @@ function AdminHome() {
       qc.invalidateQueries({ queryKey: ["admin", "orders"] });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
   };
+
+  const runTrust = async (id: string) => {
+    setCheckingId(id);
+    try {
+      const res = await checkTrust({ data: { id } });
+      toast.success(`AI verdict: ${res.level.replace("_", " ")}`);
+      qc.invalidateQueries({ queryKey: ["admin", "events"] });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "AI check failed"); }
+    finally { setCheckingId(null); }
+  };
+
 
   return (
     <DashboardShell
@@ -110,12 +126,22 @@ function AdminHome() {
                       </div>
                       {e.trust_reason && <div className="text-xs text-muted-foreground mt-1 italic">🤖 {e.trust_reason}</div>}
                     </div>
-                    {e.status === "pending" && (
-                      <div className="flex gap-2">
-                        <button onClick={() => act(e.id, "approved")} className="h-9 px-4 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs">Approve</button>
-                        <button onClick={() => act(e.id, "rejected")} className="h-9 px-4 rounded-full bg-destructive/15 text-destructive border border-destructive/30 text-xs">Reject</button>
-                      </div>
-                    )}
+                    <div className="flex gap-2 flex-wrap">
+                      <button
+                        onClick={() => runTrust(e.id)}
+                        disabled={checkingId === e.id}
+                        className="h-9 px-4 rounded-full bg-primary/15 text-primary border border-primary/30 text-xs disabled:opacity-50"
+                      >
+                        {checkingId === e.id ? "Checking…" : e.trust_level ? "Re-check with AI" : "Check with AI"}
+                      </button>
+                      {e.status === "pending" && (
+                        <>
+                          <button onClick={() => act(e.id, "approved")} className="h-9 px-4 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs">Approve</button>
+                          <button onClick={() => act(e.id, "rejected")} className="h-9 px-4 rounded-full bg-destructive/15 text-destructive border border-destructive/30 text-xs">Reject</button>
+                        </>
+                      )}
+                    </div>
+
                   </div>
                 </div>
               ))}

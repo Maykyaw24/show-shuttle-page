@@ -88,53 +88,6 @@ export const createEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => createEventSchema.parse(i))
   .handler(async ({ data, context }) => {
-    // AI trust check (best-effort)
-    let trust: { level: "trusted" | "needs_review" | "suspicious"; reason: string } = {
-      level: "needs_review",
-      reason: "Automatic check unavailable; queued for manual review.",
-    };
-    try {
-      const apiKey = process.env.LOVABLE_API_KEY;
-      if (apiKey) {
-        const prompt = `You are a fraud analyst reviewing a concert ticket listing on a marketplace. Return STRICT JSON: {"level":"trusted|needs_review|suspicious","reason":"one short sentence"}.
-Consider: unrealistic pricing, vague/copy-pasted descriptions, mismatched artist/venue, past dates, missing image.
-Listing:
-Title: ${data.title}
-Artist: ${data.artist}
-Venue: ${data.venue}, ${data.city}
-Category: ${data.category}
-Date: ${data.event_date}
-Price: ${data.price}
-Tickets: ${data.ticket_count}
-Description: ${data.description ?? "(none)"}
-Image: ${data.image_url ? "provided" : "missing"}`;
-        const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { "content-type": "application/json", "Lovable-API-Key": apiKey },
-          body: JSON.stringify({
-            model: "google/gemini-3.5-flash",
-            messages: [
-              { role: "system", content: "Return only strict JSON." },
-              { role: "user", content: prompt },
-            ],
-          }),
-        });
-        if (r.ok) {
-          const j: { choices?: { message?: { content?: string } }[] } = await r.json();
-          const txt = j.choices?.[0]?.message?.content ?? "";
-          const m = txt.match(/\{[\s\S]*\}/);
-          if (m) {
-            const parsed = JSON.parse(m[0]);
-            if (parsed.level && ["trusted", "needs_review", "suspicious"].includes(parsed.level)) {
-              trust = { level: parsed.level, reason: String(parsed.reason ?? "") };
-            }
-          }
-        }
-      }
-    } catch (e) {
-      console.error("trust check failed", e);
-    }
-
     const { data: row, error } = await context.supabase
       .from("events")
       .insert({
@@ -150,14 +103,13 @@ Image: ${data.image_url ? "provided" : "missing"}`;
         description: data.description ?? null,
         image_url: data.image_url ?? null,
         status: "pending",
-        trust_level: trust.level,
-        trust_reason: trust.reason,
       })
       .select()
       .single();
     if (error) throw new Error(error.message);
     return row;
   });
+
 
 export const listMyEvents = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -305,6 +257,78 @@ export const adminListPendingEvents = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return data ?? [];
   });
+
+export const adminCheckEventTrust = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context as never);
+    const { data: ev, error: evErr } = await context.supabase
+      .from("events")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (evErr) throw new Error(evErr.message);
+    if (!ev) throw new Error("Event not found");
+
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("AI is not configured (missing LOVABLE_API_KEY).");
+
+    const prompt = `You are a fraud analyst reviewing a concert ticket listing on a marketplace. Return STRICT JSON: {"level":"trusted|needs_review|suspicious","reason":"one short sentence explaining why"}.
+Consider: unrealistic pricing, vague or copy-pasted descriptions, mismatched artist/venue, past dates, missing image, suspicious ticket counts.
+Listing:
+Title: ${ev.title}
+Artist: ${ev.artist}
+Venue: ${ev.venue}, ${ev.city}
+Category: ${ev.category}
+Date: ${ev.event_date}
+Price: ${ev.price}
+Tickets: ${ev.ticket_count}
+Description: ${ev.description ?? "(none)"}
+Image: ${ev.image_url ? "provided" : "missing"}`;
+
+    const userContent: Array<Record<string, unknown>> = [{ type: "text", text: prompt }];
+    if (ev.image_url) userContent.push({ type: "image_url", image_url: { url: ev.image_url } });
+
+    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { "content-type": "application/json", "Lovable-API-Key": apiKey },
+      body: JSON.stringify({
+        model: "openai/gpt-5.5",
+        messages: [
+          { role: "system", content: "Return only strict JSON with keys level and reason." },
+          { role: "user", content: userContent },
+        ],
+      }),
+    });
+    if (r.status === 429) throw new Error("AI rate limit reached. Try again shortly.");
+    if (r.status === 402) throw new Error("AI credits exhausted. Add credits to continue.");
+    if (!r.ok) throw new Error(`AI check failed (${r.status})`);
+
+    const j: { choices?: { message?: { content?: string } }[] } = await r.json();
+    const txt = j.choices?.[0]?.message?.content ?? "";
+    const m = txt.match(/\{[\s\S]*\}/);
+    let level: "trusted" | "needs_review" | "suspicious" = "needs_review";
+    let reason = "Model returned no verdict.";
+    if (m) {
+      try {
+        const parsed = JSON.parse(m[0]);
+        if (["trusted", "needs_review", "suspicious"].includes(parsed.level)) {
+          level = parsed.level;
+          reason = String(parsed.reason ?? "").slice(0, 500);
+        }
+      } catch { /* keep defaults */ }
+    }
+
+    const { error: upErr } = await context.supabase
+      .from("events")
+      .update({ trust_level: level, trust_reason: reason })
+      .eq("id", data.id);
+    if (upErr) throw new Error(upErr.message);
+
+    return { level, reason };
+  });
+
 
 export const adminSetEventStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
