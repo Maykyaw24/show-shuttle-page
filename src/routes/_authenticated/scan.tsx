@@ -166,12 +166,32 @@ function ScanPage() {
 
       <main className="max-w-lg mx-auto px-4 py-10">
         <h1 className="text-3xl font-black">Scan ticket</h1>
-        <p className="text-sm text-muted-foreground">Paste or type the QR code from the buyer's ticket.</p>
+        <p className="text-sm text-muted-foreground">Scan with your camera, or paste the QR code from the buyer's ticket.</p>
 
         {!result && (
-          <div className="mt-6 rounded-2xl border border-border/60 card-premium p-6">
+          <div className="mt-6 rounded-2xl border border-border/60 card-premium p-6 space-y-4">
+            {camOn ? (
+              <div className="space-y-3">
+                <div id="qr-reader" className="w-full overflow-hidden rounded-xl bg-black" />
+                <button
+                  onClick={() => void stopCamera()}
+                  className="w-full h-11 rounded-full border border-border/60 text-sm"
+                >Stop camera</button>
+              </div>
+            ) : (
+              <button
+                onClick={() => void startCamera()}
+                disabled={busy}
+                className="w-full h-12 rounded-full bg-gradient-gold text-primary-foreground font-medium shadow-gold disabled:opacity-50"
+              >📷 Scan with camera</button>
+            )}
+            {camErr && <div className="text-xs text-destructive">{camErr}</div>}
+
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="h-px flex-1 bg-border/60" /> or enter manually <div className="h-px flex-1 bg-border/60" />
+            </div>
+
             <input
-              autoFocus
               value={code}
               onChange={(e) => setCode(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && onLookup()}
@@ -181,8 +201,8 @@ function ScanPage() {
             <button
               onClick={onLookup}
               disabled={busy || !code.trim()}
-              className="mt-4 w-full h-12 rounded-full bg-gradient-gold text-primary-foreground font-medium shadow-gold disabled:opacity-50"
-            >{busy ? "Looking up…" : "Scan QR"}</button>
+              className="w-full h-11 rounded-full border border-border/60 text-sm disabled:opacity-50"
+            >{busy ? "Looking up…" : "Look up ticket"}</button>
           </div>
         )}
 
