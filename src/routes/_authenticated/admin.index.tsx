@@ -11,7 +11,7 @@ import {
 import { toast } from "sonner";
 
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({ meta: [{ title: "Admin console — LiveBeat" }, { name: "robots", content: "noindex" }] }),
   component: AdminHome,
 });
