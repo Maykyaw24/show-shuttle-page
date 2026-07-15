@@ -48,9 +48,9 @@ function AdminEventsPage() {
   });
 
   const grouped = useMemo(() => {
-    const g: Record<EventStatus, typeof events> = { pending: [], approved: [], rejected: [] } as never;
+    const g: Record<EventStatus, typeof events> = { pending: [], approved: [], rejected: [], cancelled: [] } as never;
     (events ?? []).forEach((e) => {
-      if (e.status === "pending" || e.status === "approved" || e.status === "rejected") {
+      if (e.status === "pending" || e.status === "approved" || e.status === "rejected" || e.status === "cancelled") {
         (g[e.status as EventStatus] as never[]).push(e as never);
       }
     });
