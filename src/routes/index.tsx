@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import heroImg from "@/assets/hero-concert.jpg";
+import imgColdplay from "@/assets/concert-coldplay.jpg";
+import imgBlackpink from "@/assets/concert-blackpink.jpg";
+import imgBrunoMars from "@/assets/concert-brunomars.jpg";
+import imgEdSheeran from "@/assets/concert-edsheeran.jpg";
+import imgTaylorSwift from "@/assets/concert-taylorswift.jpg";
+import imgTheWeeknd from "@/assets/concert-theweeknd.jpg";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
@@ -12,17 +18,16 @@ type Concert = {
   venue: string;
   price: string;
   availability: string;
-  gradient: string;
-  emoji: string;
+  image: string;
 };
 
 const concerts: Concert[] = [
-  { artist: "Coldplay", date: "Sat, 29 Jul", venue: "National Stadium", price: "$149", availability: "12 left", gradient: "from-blue-500/40 to-purple-700/40", emoji: "🎸" },
-  { artist: "BLACKPINK", date: "Sun, 26 Aug", venue: "Impact Arena", price: "$220", availability: "Selling fast", gradient: "from-pink-500/40 to-rose-700/40", emoji: "🎤" },
-  { artist: "Bruno Mars", date: "Fri, 05 Aug", venue: "Qudos Bank Arena", price: "$189", availability: "Available", gradient: "from-amber-500/40 to-red-700/40", emoji: "🎷" },
-  { artist: "Ed Sheeran", date: "Sat, 15 Aug", venue: "Marvel Stadium", price: "$135", availability: "Last row", gradient: "from-emerald-500/40 to-teal-700/40", emoji: "🎶" },
-  { artist: "Taylor Swift", date: "Sat, 22 Aug", venue: "MetLife Stadium", price: "$310", availability: "Waitlist", gradient: "from-fuchsia-500/40 to-indigo-700/40", emoji: "✨" },
-  { artist: "The Weeknd", date: "Fri, 04 Sep", venue: "SoFi Stadium", price: "$245", availability: "Available", gradient: "from-slate-500/40 to-zinc-800/40", emoji: "🌙" },
+  { artist: "Coldplay", date: "Sat, 29 Jul", venue: "National Stadium", price: "$149", availability: "12 left", image: imgColdplay },
+  { artist: "BLACKPINK", date: "Sun, 26 Aug", venue: "Impact Arena", price: "$220", availability: "Selling fast", image: imgBlackpink },
+  { artist: "Bruno Mars", date: "Fri, 05 Aug", venue: "Qudos Bank Arena", price: "$189", availability: "Available", image: imgBrunoMars },
+  { artist: "Ed Sheeran", date: "Sat, 15 Aug", venue: "Marvel Stadium", price: "$135", availability: "Last row", image: imgEdSheeran },
+  { artist: "Taylor Swift", date: "Sat, 22 Aug", venue: "MetLife Stadium", price: "$310", availability: "Waitlist", image: imgTaylorSwift },
+  { artist: "The Weeknd", date: "Fri, 04 Sep", venue: "SoFi Stadium", price: "$245", availability: "Available", image: imgTheWeeknd },
 ];
 
 function LandingPage() {
