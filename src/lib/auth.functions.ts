@@ -102,3 +102,17 @@ export const getMyRole = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return { role: (data?.role as "buyer" | "seller" | "admin" | undefined) ?? null };
   });
+
+/** Returns the signed-in user's profile + role. */
+export const getMyProfile = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const [{ data: profile }, { data: roleRow }] = await Promise.all([
+      context.supabase.from("profiles").select("*").eq("id", context.userId).maybeSingle(),
+      context.supabase.from("user_roles").select("role").eq("user_id", context.userId).maybeSingle(),
+    ]);
+    return {
+      profile: profile ?? null,
+      role: (roleRow?.role as "buyer" | "seller" | "admin" | undefined) ?? null,
+    };
+  });
