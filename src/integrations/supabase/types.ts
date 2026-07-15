@@ -14,6 +14,172 @@ export type Database = {
   }
   public: {
     Tables: {
+      events: {
+        Row: {
+          artist: string
+          category: Database["public"]["Enums"]["event_category"]
+          city: string
+          created_at: string
+          description: string | null
+          event_date: string
+          id: string
+          image_url: string | null
+          price: number
+          rejection_reason: string | null
+          seller_id: string
+          status: Database["public"]["Enums"]["event_status"]
+          ticket_count: number
+          tickets_sold: number
+          title: string
+          trust_level: Database["public"]["Enums"]["trust_level"] | null
+          trust_reason: string | null
+          updated_at: string
+          venue: string
+        }
+        Insert: {
+          artist: string
+          category?: Database["public"]["Enums"]["event_category"]
+          city: string
+          created_at?: string
+          description?: string | null
+          event_date: string
+          id?: string
+          image_url?: string | null
+          price: number
+          rejection_reason?: string | null
+          seller_id: string
+          status?: Database["public"]["Enums"]["event_status"]
+          ticket_count: number
+          tickets_sold?: number
+          title: string
+          trust_level?: Database["public"]["Enums"]["trust_level"] | null
+          trust_reason?: string | null
+          updated_at?: string
+          venue: string
+        }
+        Update: {
+          artist?: string
+          category?: Database["public"]["Enums"]["event_category"]
+          city?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          id?: string
+          image_url?: string | null
+          price?: number
+          rejection_reason?: string | null
+          seller_id?: string
+          status?: Database["public"]["Enums"]["event_status"]
+          ticket_count?: number
+          tickets_sold?: number
+          title?: string
+          trust_level?: Database["public"]["Enums"]["trust_level"] | null
+          trust_reason?: string | null
+          updated_at?: string
+          venue?: string
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          event_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          admin_note: string | null
+          buyer_id: string
+          created_at: string
+          event_id: string
+          id: string
+          payment_proof_url: string | null
+          quantity: number
+          status: Database["public"]["Enums"]["order_status"]
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          buyer_id: string
+          created_at?: string
+          event_id: string
+          id?: string
+          payment_proof_url?: string | null
+          quantity: number
+          status?: Database["public"]["Enums"]["order_status"]
+          total_price: number
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          buyer_id?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          payment_proof_url?: string | null
+          quantity?: number
+          status?: Database["public"]["Enums"]["order_status"]
+          total_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -56,6 +222,54 @@ export type Database = {
         }
         Relationships: []
       }
+      tickets: {
+        Row: {
+          buyer_id: string
+          created_at: string
+          event_id: string
+          id: string
+          order_id: string
+          qr_code: string
+          status: Database["public"]["Enums"]["ticket_status"]
+          used_at: string | null
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string
+          event_id: string
+          id?: string
+          order_id: string
+          qr_code: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          used_at?: string | null
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          order_id?: string
+          qr_code?: string
+          status?: Database["public"]["Enums"]["ticket_status"]
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -92,7 +306,28 @@ export type Database = {
     }
     Enums: {
       app_role: "buyer" | "seller" | "admin"
+      event_category:
+        | "rock"
+        | "pop"
+        | "edm"
+        | "hiphop"
+        | "jazz"
+        | "classical"
+        | "indie"
+        | "metal"
+        | "folk"
+        | "other"
+      event_status: "pending" | "approved" | "rejected" | "cancelled"
+      order_status:
+        | "pending"
+        | "awaiting_review"
+        | "paid"
+        | "confirmed"
+        | "cancelled"
+        | "refunded"
       seller_type: "artist" | "organizer" | "promoter" | "venue" | "agency"
+      ticket_status: "valid" | "used" | "pending" | "cancelled"
+      trust_level: "trusted" | "needs_review" | "suspicious"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -221,7 +456,30 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["buyer", "seller", "admin"],
+      event_category: [
+        "rock",
+        "pop",
+        "edm",
+        "hiphop",
+        "jazz",
+        "classical",
+        "indie",
+        "metal",
+        "folk",
+        "other",
+      ],
+      event_status: ["pending", "approved", "rejected", "cancelled"],
+      order_status: [
+        "pending",
+        "awaiting_review",
+        "paid",
+        "confirmed",
+        "cancelled",
+        "refunded",
+      ],
       seller_type: ["artist", "organizer", "promoter", "venue", "agency"],
+      ticket_status: ["valid", "used", "pending", "cancelled"],
+      trust_level: ["trusted", "needs_review", "suspicious"],
     },
   },
 } as const
