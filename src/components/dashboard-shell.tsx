@@ -126,7 +126,7 @@ export function StatusBadge({
         ? "bg-accent/15 text-accent border-accent/30"
         : s.includes("sold") || s.includes("used") || s.includes("closed")
           ? "bg-muted text-muted-foreground border-border"
-          : s.includes("reject") || s.includes("suspicious") || s.includes("flag")
+          : s.includes("reject") || s.includes("suspicious") || s.includes("flag") || s.includes("cancel")
             ? "bg-destructive/15 text-destructive border-destructive/30"
             : "bg-muted text-muted-foreground border-border";
   return (
