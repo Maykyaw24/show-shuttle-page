@@ -6,8 +6,10 @@ import { DashboardShell, SectionCard, StatCard, StatusBadge } from "@/components
 import {
   adminListPendingEvents, adminSetEventStatus,
   adminListOrders, adminConfirmOrder, adminRejectOrder,
+  adminCheckEventTrust,
 } from "@/lib/marketplace.functions";
 import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin console — LiveBeat" }, { name: "robots", content: "noindex" }] }),
