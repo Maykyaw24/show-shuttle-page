@@ -427,28 +427,48 @@ export const adminRejectOrder = createServerFn({ method: "POST" })
 
 /* ---------------- SCAN ---------------- */
 
-export const scanTicket = createServerFn({ method: "POST" })
+export const lookupTicket = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ qr_code: z.string().min(4).max(200) }).parse(i))
   .handler(async ({ data, context }) => {
-    const isAdmin = (await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" })).data;
+    const isAdmin = !!(await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" })).data;
     const { data: ticket, error } = await context.supabase
       .from("tickets")
-      .select("*, events(title, artist, event_date, seller_id)")
+      .select("*, events(title, artist, venue, city, event_date, image_url, seller_id)")
+      .eq("qr_code", data.qr_code)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!ticket) return { ok: false, isAdmin, canManage: false, reason: "Invalid QR code — no ticket found." };
+    const ev = (ticket as { events?: { seller_id?: string } }).events;
+    const canManage = isAdmin || ev?.seller_id === context.userId;
+    return { ok: true, isAdmin, canManage, ticket };
+  });
+
+export const markTicketUsed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ qr_code: z.string().min(4).max(200) }).parse(i))
+  .handler(async ({ data, context }) => {
+    const isAdmin = !!(await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" })).data;
+    const { data: ticket, error } = await context.supabase
+      .from("tickets")
+      .select("*, events(title, artist, venue, city, event_date, image_url, seller_id)")
       .eq("qr_code", data.qr_code)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!ticket) return { ok: false, reason: "Invalid QR code" };
-    // Seller of event or admin can scan
     const canScan = isAdmin || (ticket as { events?: { seller_id: string } }).events?.seller_id === context.userId;
-    if (!canScan) return { ok: false, reason: "Not authorized to scan this ticket" };
+    if (!canScan) return { ok: false, reason: "Not authorized to mark this ticket", ticket };
     if (ticket.status === "used") return { ok: false, reason: "Ticket already used", ticket };
     if (ticket.status !== "valid") return { ok: false, reason: `Ticket status: ${ticket.status}`, ticket };
 
+    const nowIso = new Date().toISOString();
     const { error: updateErr } = await context.supabase
       .from("tickets")
-      .update({ status: "used", used_at: new Date().toISOString() })
+      .update({ status: "used", used_at: nowIso })
       .eq("id", ticket.id);
     if (updateErr) throw new Error(updateErr.message);
-    return { ok: true, ticket };
+    return { ok: true, ticket: { ...ticket, status: "used", used_at: nowIso } };
   });
+
+// Legacy alias (kept for existing callers)
+export const scanTicket = markTicketUsed;
