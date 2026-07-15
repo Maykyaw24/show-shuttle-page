@@ -92,10 +92,6 @@ function LoginForm() {
       return toast.error(error.message);
     }
     toast.success("Welcome back!");
-    if (email.trim().toLowerCase() === "pachi55447@gmail.com") {
-      navigate({ to: "/seller" });
-      return;
-    }
     navigate({ to: "/" });
   };
 
