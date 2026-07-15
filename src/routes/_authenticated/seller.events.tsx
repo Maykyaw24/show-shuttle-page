@@ -14,7 +14,6 @@ export const Route = createFileRoute("/_authenticated/seller/events")({
 const NAV = [
   { label: "Home", to: "/seller" },
   { label: "My Events", to: "/seller/events" },
-  { label: "Scan", to: "/scan" },
 ];
 
 type EventStatus = "approved" | "pending" | "rejected";
