@@ -77,9 +77,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ticket Hub — Premium Concert Ticket Marketplace" },
+      { title: "LiveBeat — Premium Concert Ticket Marketplace" },
       { name: "description", content: "Discover luxury concerts, buy verified tickets, and sell with confidence. Every ticket is protected with a unique QR code and admin-approved sellers." },
-      { property: "og:title", content: "Ticket Hub — Premium Concert Ticket Marketplace" },
+      { property: "og:title", content: "LiveBeat — Premium Concert Ticket Marketplace" },
       { property: "og:description", content: "Discover luxury concerts, buy verified tickets, and sell with confidence." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

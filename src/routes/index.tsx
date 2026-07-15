@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import heroImg from "@/assets/hero-concert.jpg";
+import imgColdplay from "@/assets/concert-coldplay.jpg";
+import imgBlackpink from "@/assets/concert-blackpink.jpg";
+import imgBrunoMars from "@/assets/concert-brunomars.jpg";
+import imgEdSheeran from "@/assets/concert-edsheeran.jpg";
+import imgTaylorSwift from "@/assets/concert-taylorswift.jpg";
+import imgTheWeeknd from "@/assets/concert-theweeknd.jpg";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
@@ -12,17 +18,16 @@ type Concert = {
   venue: string;
   price: string;
   availability: string;
-  gradient: string;
-  emoji: string;
+  image: string;
 };
 
 const concerts: Concert[] = [
-  { artist: "Coldplay", date: "Sat, 29 Jul", venue: "National Stadium", price: "$149", availability: "12 left", gradient: "from-blue-500/40 to-purple-700/40", emoji: "🎸" },
-  { artist: "BLACKPINK", date: "Sun, 26 Aug", venue: "Impact Arena", price: "$220", availability: "Selling fast", gradient: "from-pink-500/40 to-rose-700/40", emoji: "🎤" },
-  { artist: "Bruno Mars", date: "Fri, 05 Aug", venue: "Qudos Bank Arena", price: "$189", availability: "Available", gradient: "from-amber-500/40 to-red-700/40", emoji: "🎷" },
-  { artist: "Ed Sheeran", date: "Sat, 15 Aug", venue: "Marvel Stadium", price: "$135", availability: "Last row", gradient: "from-emerald-500/40 to-teal-700/40", emoji: "🎶" },
-  { artist: "Taylor Swift", date: "Sat, 22 Aug", venue: "MetLife Stadium", price: "$310", availability: "Waitlist", gradient: "from-fuchsia-500/40 to-indigo-700/40", emoji: "✨" },
-  { artist: "The Weeknd", date: "Fri, 04 Sep", venue: "SoFi Stadium", price: "$245", availability: "Available", gradient: "from-slate-500/40 to-zinc-800/40", emoji: "🌙" },
+  { artist: "Coldplay", date: "Sat, 29 Jul", venue: "National Stadium", price: "$149", availability: "12 left", image: imgColdplay },
+  { artist: "BLACKPINK", date: "Sun, 26 Aug", venue: "Impact Arena", price: "$220", availability: "Selling fast", image: imgBlackpink },
+  { artist: "Bruno Mars", date: "Fri, 05 Aug", venue: "Qudos Bank Arena", price: "$189", availability: "Available", image: imgBrunoMars },
+  { artist: "Ed Sheeran", date: "Sat, 15 Aug", venue: "Marvel Stadium", price: "$135", availability: "Last row", image: imgEdSheeran },
+  { artist: "Taylor Swift", date: "Sat, 22 Aug", venue: "MetLife Stadium", price: "$310", availability: "Waitlist", image: imgTaylorSwift },
+  { artist: "The Weeknd", date: "Fri, 04 Sep", venue: "SoFi Stadium", price: "$245", availability: "Available", image: imgTheWeeknd },
 ];
 
 function LandingPage() {
@@ -58,9 +63,9 @@ function Header({ onLogin, onSell }: { onLogin: () => void; onSell: () => void }
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
         <a href="#" className="flex items-center gap-2 group">
           <div className="w-9 h-9 rounded-lg bg-gradient-gold flex items-center justify-center shadow-gold">
-            <span className="text-primary-foreground font-bold text-lg">T</span>
+            <span className="text-primary-foreground font-bold text-lg">L</span>
           </div>
-          <span className="font-display text-xl tracking-wide">Ticket<span className="text-gradient-gold">Hub</span></span>
+          <span className="font-display text-xl tracking-wide">Live<span className="text-gradient-gold">Beat</span></span>
         </a>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#concerts" className="hover:text-foreground transition">Concerts</a>
@@ -166,10 +171,11 @@ function Concerts({ onBuy }: { onBuy: (reason: string) => void }) {
         <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {concerts.map((c) => (
             <article key={c.artist} className="card-premium rounded-2xl overflow-hidden group hover:shadow-elegant transition">
-              <div className={`relative h-48 bg-gradient-to-br ${c.gradient} flex items-center justify-center`}>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,215,120,0.35),transparent_60%)]" />
-                <span className="text-6xl relative z-10 drop-shadow-lg">{c.emoji}</span>
-                <button aria-label="Save" onClick={() => onBuy("Sign in to save concerts")} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-background/60 backdrop-blur flex items-center justify-center text-primary hover:bg-background/90 transition">♥</button>
+              <div className="relative h-48 overflow-hidden">
+                <img src={c.image} alt={`${c.artist} live in concert`} loading="lazy" width={1200} height={900} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+                <button aria-label="Save" onClick={() => onBuy("Sign in to save concerts")} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-background/70 backdrop-blur flex items-center justify-center text-primary hover:bg-background/90 transition">♥</button>
+                <span className="absolute bottom-2 left-3 text-[10px] uppercase tracking-widest text-primary/90 font-semibold">● Live</span>
               </div>
               <div className="p-5">
                 <h3 className="font-display text-xl">{c.artist}</h3>
@@ -248,7 +254,7 @@ function AIChatbot({ onTry }: { onTry: () => void }) {
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <div className="w-9 h-9 rounded-full bg-gradient-gold flex items-center justify-center">✨</div>
               <div>
-                <div className="font-semibold">TicketHub AI</div>
+                <div className="font-semibold">LiveBeat AI</div>
                 <div className="text-xs text-emerald-400">● Online</div>
               </div>
             </div>
@@ -401,12 +407,12 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-10">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-gold flex items-center justify-center text-primary-foreground font-bold">T</div>
-            <span className="font-display text-lg">Ticket<span className="text-gradient-gold">Hub</span></span>
+            <div className="w-8 h-8 rounded-lg bg-gradient-gold flex items-center justify-center text-primary-foreground font-bold">L</div>
+            <span className="font-display text-lg">Live<span className="text-gradient-gold">Beat</span></span>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">Premium tickets to the world's most unforgettable nights.</p>
         </div>
-        <FooterCol title="Contact" items={["hello@tickethub.co", "+1 (555) 010-2024", "24/7 chat support"]} />
+        <FooterCol title="Contact" items={["hello@livebeat.co", "+1 (555) 010-2024", "24/7 chat support"]} />
         <FooterCol title="Support" items={["Help center", "Refund policy", "Ticket transfer", "Report an issue"]} />
         <div>
           <div className="font-semibold mb-4">Follow</div>
@@ -419,7 +425,7 @@ function Footer() {
       </div>
       <div className="border-t border-border/60">
         <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between text-xs text-muted-foreground gap-2">
-          <span>© 2026 TicketHub. All rights reserved.</span>
+          <span>© 2026 LiveBeat. All rights reserved.</span>
           <div className="flex gap-6">
             <a href="#" className="hover:text-foreground">Privacy</a>
             <a href="#" className="hover:text-foreground">Terms</a>
