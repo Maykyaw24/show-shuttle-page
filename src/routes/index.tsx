@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { type ReactNode } from "react";
 import heroImg from "@/assets/hero-concert.jpg";
 import imgColdplay from "@/assets/concert-coldplay.jpg";
 import imgBlackpink from "@/assets/concert-blackpink.jpg";
@@ -7,6 +7,7 @@ import imgBrunoMars from "@/assets/concert-brunomars.jpg";
 import imgEdSheeran from "@/assets/concert-edsheeran.jpg";
 import imgTaylorSwift from "@/assets/concert-taylorswift.jpg";
 import imgTheWeeknd from "@/assets/concert-theweeknd.jpg";
+import { useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
@@ -31,33 +32,32 @@ const concerts: Concert[] = [
 ];
 
 function LandingPage() {
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [loginReason, setLoginReason] = useState("");
+  const navigate = useNavigate();
+  const { user } = useSession();
 
-  const requireLogin = (reason: string) => {
-    setLoginReason(reason);
-    setLoginOpen(true);
+  const goAuth = (_reason?: string) => {
+    if (user) navigate({ to: "/dashboard" });
+    else navigate({ to: "/auth" });
   };
 
   return (
     <div className="min-h-screen bg-background text-foreground font-[Inter,sans-serif] overflow-x-hidden">
-      <Header onLogin={() => requireLogin("Sign in to continue")} onSell={() => requireLogin("Sign in to sell tickets")} />
-      <Hero onBrowse={() => requireLogin("Sign in to browse and buy tickets")} onSell={() => requireLogin("Sign in to list tickets")} />
+      <Header signedIn={!!user} onLogin={() => goAuth()} onSell={() => goAuth("Sign in to sell tickets")} />
+      <Hero onBrowse={() => goAuth("Sign in to browse and buy tickets")} onSell={() => goAuth("Sign in to list tickets")} />
       <HowItWorks />
-      <Concerts onBuy={requireLogin} />
+      <Concerts onBuy={goAuth} />
       <TrustSafety />
-      <AIChatbot onTry={() => requireLogin("Sign in to chat with our AI assistant")} />
+      <AIChatbot onTry={() => goAuth("Sign in to chat with our AI assistant")} />
       <QRSection />
-      <SellerBuyerSplit onSeller={() => requireLogin("Sign in to become a seller")} onBuyer={() => requireLogin("Sign in to buy tickets")} />
-      <CTA onStart={() => requireLogin("Create an account to get started")} />
+      <SellerBuyerSplit onSeller={() => goAuth("Sign in to become a seller")} onBuyer={() => goAuth("Sign in to buy tickets")} />
+      <CTA onStart={() => goAuth("Create an account to get started")} />
       <Footer />
-      {loginOpen && <LoginModal reason={loginReason} onClose={() => setLoginOpen(false)} />}
     </div>
   );
 }
 
 /* ---------------- Header ---------------- */
-function Header({ onLogin, onSell }: { onLogin: () => void; onSell: () => void }) {
+function Header({ signedIn, onLogin, onSell }: { signedIn: boolean; onLogin: () => void; onSell: () => void }) {
   return (
     <header className="fixed top-0 inset-x-0 z-40 backdrop-blur-xl bg-background/70 border-b border-border/60">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
@@ -74,9 +74,11 @@ function Header({ onLogin, onSell }: { onLogin: () => void; onSell: () => void }
           <a href="#safety" className="hover:text-foreground transition">Trust & Safety</a>
         </nav>
         <div className="flex items-center gap-3">
-          <button onClick={onLogin} className="text-sm text-muted-foreground hover:text-foreground transition">Sign in</button>
+          <button onClick={onLogin} className="text-sm text-muted-foreground hover:text-foreground transition">
+            {signedIn ? "My dashboard" : "Sign in"}
+          </button>
           <button onClick={onSell} className="hidden sm:inline-flex text-sm font-medium px-4 py-2 rounded-full bg-gradient-gold text-primary-foreground shadow-gold hover:opacity-95 transition">
-            Sell Tickets
+            {signedIn ? "Open app" : "Sell Tickets"}
           </button>
         </div>
       </div>
@@ -458,24 +460,3 @@ function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
   );
 }
 
-/* ---------------- Login Modal ---------------- */
-function LoginModal({ reason, onClose }: { reason: string; onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-      <div className="card-premium rounded-3xl p-8 max-w-md w-full shadow-elegant relative">
-        <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 w-8 h-8 rounded-full hover:bg-secondary flex items-center justify-center">✕</button>
-        <div className="w-14 h-14 rounded-2xl bg-gradient-gold flex items-center justify-center text-primary-foreground text-2xl mx-auto shadow-gold">🔒</div>
-        <h3 className="font-display text-2xl text-center mt-4">Login required</h3>
-        <p className="text-center text-muted-foreground mt-2 text-sm">{reason}</p>
-        <form className="mt-6 space-y-3" onSubmit={(e) => { e.preventDefault(); onClose(); }}>
-          <input type="email" required placeholder="Email address" className="w-full px-4 py-3 rounded-xl bg-input border border-border focus:border-primary/60 focus:outline-none text-sm" />
-          <input type="password" required placeholder="Password" className="w-full px-4 py-3 rounded-xl bg-input border border-border focus:border-primary/60 focus:outline-none text-sm" />
-          <button type="submit" className="w-full py-3 rounded-xl bg-gradient-gold text-primary-foreground font-semibold text-sm shadow-gold">Sign In</button>
-        </form>
-        <div className="mt-4 text-center text-sm text-muted-foreground">
-          New here? <a href="#" className="text-primary hover:underline">Create an account</a>
-        </div>
-      </div>
-    </div>
-  );
-}
