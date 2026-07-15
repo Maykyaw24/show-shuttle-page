@@ -116,3 +116,62 @@ export const getMyProfile = createServerFn({ method: "GET" })
       role: (roleRow?.role as "buyer" | "seller" | "admin" | undefined) ?? null,
     };
   });
+
+/**
+ * If the user has no role row yet, read the pending signup payload from
+ * auth.user_metadata.pending_signup and materialize the profile + role.
+ * Called from the dashboard router on first authenticated visit after
+ * email confirmation (when the signUp() call returned no session).
+ */
+export const ensureRoleFromMetadata = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const userId = context.userId;
+
+    const { data: existing } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (existing?.role) return { role: existing.role as "buyer" | "seller" | "admin" };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: userRes, error: userErr } = await supabaseAdmin.auth.admin.getUserById(userId);
+    if (userErr || !userRes?.user) return { role: null };
+
+    const pending = (userRes.user.user_metadata ?? {}).pending_signup;
+    const parsed = signupSchema.safeParse(pending);
+    if (!parsed.success) return { role: null };
+    const data = parsed.data;
+
+    if (data.role === "admin" && data.admin_code !== ADMIN_CODE) {
+      return { role: null };
+    }
+
+    const profile =
+      data.role === "buyer"
+        ? { id: userId, full_name: data.full_name, phone: data.phone, city: data.city, avatar_url: data.avatar_url ?? null }
+        : data.role === "seller"
+        ? {
+            id: userId,
+            full_name: data.full_name,
+            phone: data.phone,
+            city: data.city,
+            avatar_url: data.avatar_url ?? null,
+            organization: data.organization,
+            seller_type: data.seller_type,
+            event_category: data.event_category,
+            bio: data.bio ?? null,
+          }
+        : { id: userId, full_name: data.full_name };
+
+    await supabaseAdmin.from("profiles").upsert(profile as never, { onConflict: "id" });
+    await supabaseAdmin.from("user_roles").insert({ user_id: userId, role: data.role });
+
+    // Clear the pending payload so we don't re-run this.
+    await supabaseAdmin.auth.admin.updateUserById(userId, {
+      user_metadata: { ...userRes.user.user_metadata, pending_signup: null },
+    });
+
+    return { role: data.role };
+  });
