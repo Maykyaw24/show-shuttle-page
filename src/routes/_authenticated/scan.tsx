@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { Scanner, type IDetectedBarcode } from "@yudiel/react-qr-scanner";
 import { DashboardShell, SectionCard, StatusBadge } from "@/components/dashboard-shell";
 import { lookupTicket, markTicketUsed } from "@/lib/marketplace.functions";
 import { toast } from "sonner";
