@@ -22,6 +22,7 @@ export function DashboardShell({
   children: ReactNode;
 }) {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const signOut = async () => {
     await supabase.auth.signOut();
