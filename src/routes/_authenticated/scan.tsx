@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { Scanner, type IDetectedBarcode } from "@yudiel/react-qr-scanner";
 import { DashboardShell, SectionCard, StatusBadge } from "@/components/dashboard-shell";
 import { lookupTicket, markTicketUsed } from "@/lib/marketplace.functions";
 import { toast } from "sonner";
@@ -44,22 +45,40 @@ function ScanPage() {
   const [code, setCode] = useState("");
   const [result, setResult] = useState<TicketResult | null>(null);
   const [busy, setBusy] = useState(false);
+  const [cameraOn, setCameraOn] = useState(false);
+  const lastScanRef = useRef<{ code: string; at: number }>({ code: "", at: 0 });
   const lookup = useServerFn(lookupTicket);
   const markUsed = useServerFn(markTicketUsed);
 
-  const doLookup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!code.trim()) return;
+  const runLookup = async (qr: string) => {
     setBusy(true);
     try {
-      const r = (await lookup({ data: { qr_code: code.trim() } })) as TicketResult;
+      const r = (await lookup({ data: { qr_code: qr } })) as TicketResult;
       setResult(r);
       if (!r.ok) toast.error(r.reason ?? "Not found");
+      else toast.success("Ticket found");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Lookup failed");
     } finally {
       setBusy(false);
     }
+  };
+
+  const onScan = (codes: IDetectedBarcode[]) => {
+    const v = codes[0]?.rawValue?.trim();
+    if (!v) return;
+    const now = Date.now();
+    if (lastScanRef.current.code === v && now - lastScanRef.current.at < 3000) return;
+    lastScanRef.current = { code: v, at: now };
+    setCode(v);
+    setCameraOn(false);
+    void runLookup(v);
+  };
+
+  const doLookup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!code.trim()) return;
+    await runLookup(code.trim());
   };
 
   const doMark = async () => {
@@ -86,7 +105,33 @@ function ScanPage() {
       nav={NAV}
       userBadge={ADMIN_BADGE}
     >
-      <div className="max-w-2xl">
+      <div className="max-w-2xl space-y-6">
+        <SectionCard title="📷 Camera scan">
+          <div className="flex flex-wrap gap-2 mb-3">
+            <button
+              onClick={() => setCameraOn((v) => !v)}
+              className={`h-10 px-5 rounded-full text-sm border transition ${cameraOn ? "bg-destructive/15 text-destructive border-destructive/30" : "bg-primary text-primary-foreground border-primary shadow-gold"}`}
+            >
+              {cameraOn ? "Stop camera" : "Start camera"}
+            </button>
+            <p className="text-xs text-muted-foreground self-center">
+              Point the camera at a ticket QR code — it will scan automatically.
+            </p>
+          </div>
+          {cameraOn && (
+            <div className="rounded-xl overflow-hidden border border-border/60 bg-black aspect-square max-w-md">
+              <Scanner
+                onScan={onScan}
+                onError={(err) => toast.error(err instanceof Error ? err.message : "Camera error")}
+                constraints={{ facingMode: "environment" }}
+                formats={["qr_code"]}
+                components={{ finder: true }}
+                styles={{ container: { width: "100%", height: "100%" } }}
+              />
+            </div>
+          )}
+        </SectionCard>
+
         <SectionCard title="🎫 Lookup ticket">
           <form onSubmit={doLookup} className="flex flex-col sm:flex-row gap-2">
             <input
@@ -103,6 +148,7 @@ function ScanPage() {
               {busy ? "Checking…" : "Look up"}
             </button>
           </form>
+
 
           {t && (
             <div className="mt-6 rounded-xl border border-border/60 p-4">
