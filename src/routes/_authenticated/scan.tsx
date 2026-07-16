@@ -45,8 +45,35 @@ function ScanPage() {
   const [code, setCode] = useState("");
   const [result, setResult] = useState<TicketResult | null>(null);
   const [busy, setBusy] = useState(false);
+  const [cameraOn, setCameraOn] = useState(false);
+  const lastScanRef = useRef<{ code: string; at: number }>({ code: "", at: 0 });
   const lookup = useServerFn(lookupTicket);
   const markUsed = useServerFn(markTicketUsed);
+
+  const runLookup = async (qr: string) => {
+    setBusy(true);
+    try {
+      const r = (await lookup({ data: { qr_code: qr } })) as TicketResult;
+      setResult(r);
+      if (!r.ok) toast.error(r.reason ?? "Not found");
+      else toast.success("Ticket found");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Lookup failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onScan = (codes: IDetectedBarcode[]) => {
+    const v = codes[0]?.rawValue?.trim();
+    if (!v) return;
+    const now = Date.now();
+    if (lastScanRef.current.code === v && now - lastScanRef.current.at < 3000) return;
+    lastScanRef.current = { code: v, at: now };
+    setCode(v);
+    setCameraOn(false);
+    void runLookup(v);
+  };
 
   const doLookup = async (e: React.FormEvent) => {
     e.preventDefault();
