@@ -18,6 +18,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EventsIdRouteImport } from './routes/events.$id'
 import { Route as AuthenticatedSellerRouteImport } from './routes/_authenticated/seller'
+import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedMyTicketsRouteImport } from './routes/_authenticated/my-tickets'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBuyerRouteImport } from './routes/_authenticated/buyer'
@@ -70,6 +71,11 @@ const EventsIdRoute = EventsIdRouteImport.update({
 const AuthenticatedSellerRoute = AuthenticatedSellerRouteImport.update({
   id: '/seller',
   path: '/seller',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMyTicketsRoute = AuthenticatedMyTicketsRouteImport.update({
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/buyer': typeof AuthenticatedBuyerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/scan': typeof AuthenticatedScanRoute
   '/seller': typeof AuthenticatedSellerRouteWithChildren
   '/events/$id': typeof EventsIdRoute
   '/admin/events': typeof AuthenticatedAdminEventsRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/buyer': typeof AuthenticatedBuyerRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/scan': typeof AuthenticatedScanRoute
   '/events/$id': typeof EventsIdRoute
   '/admin/events': typeof AuthenticatedAdminEventsRoute
   '/checkout/$eventId': typeof AuthenticatedCheckoutEventIdRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/_authenticated/buyer': typeof AuthenticatedBuyerRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/my-tickets': typeof AuthenticatedMyTicketsRoute
+  '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/seller': typeof AuthenticatedSellerRouteWithChildren
   '/events/$id': typeof EventsIdRoute
   '/_authenticated/admin/events': typeof AuthenticatedAdminEventsRoute
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/buyer'
     | '/dashboard'
     | '/my-tickets'
+    | '/scan'
     | '/seller'
     | '/events/$id'
     | '/admin/events'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/buyer'
     | '/dashboard'
     | '/my-tickets'
+    | '/scan'
     | '/events/$id'
     | '/admin/events'
     | '/checkout/$eventId'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/_authenticated/buyer'
     | '/_authenticated/dashboard'
     | '/_authenticated/my-tickets'
+    | '/_authenticated/scan'
     | '/_authenticated/seller'
     | '/events/$id'
     | '/_authenticated/admin/events'
@@ -316,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSellerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/scan': {
+      id: '/_authenticated/scan'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof AuthenticatedScanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/my-tickets': {
       id: '/_authenticated/my-tickets'
       path: '/my-tickets'
@@ -399,6 +418,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBuyerRoute: typeof AuthenticatedBuyerRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedMyTicketsRoute: typeof AuthenticatedMyTicketsRoute
+  AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSellerRoute: typeof AuthenticatedSellerRouteWithChildren
   AuthenticatedAdminEventsRoute: typeof AuthenticatedAdminEventsRoute
   AuthenticatedCheckoutEventIdRoute: typeof AuthenticatedCheckoutEventIdRoute
@@ -410,6 +430,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBuyerRoute: AuthenticatedBuyerRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedMyTicketsRoute: AuthenticatedMyTicketsRoute,
+  AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSellerRoute: AuthenticatedSellerRouteWithChildren,
   AuthenticatedAdminEventsRoute: AuthenticatedAdminEventsRoute,
   AuthenticatedCheckoutEventIdRoute: AuthenticatedCheckoutEventIdRoute,
@@ -433,13 +454,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
