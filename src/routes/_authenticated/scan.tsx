@@ -105,7 +105,33 @@ function ScanPage() {
       nav={NAV}
       userBadge={ADMIN_BADGE}
     >
-      <div className="max-w-2xl">
+      <div className="max-w-2xl space-y-6">
+        <SectionCard title="📷 Camera scan">
+          <div className="flex flex-wrap gap-2 mb-3">
+            <button
+              onClick={() => setCameraOn((v) => !v)}
+              className={`h-10 px-5 rounded-full text-sm border transition ${cameraOn ? "bg-destructive/15 text-destructive border-destructive/30" : "bg-primary text-primary-foreground border-primary shadow-gold"}`}
+            >
+              {cameraOn ? "Stop camera" : "Start camera"}
+            </button>
+            <p className="text-xs text-muted-foreground self-center">
+              Point the camera at a ticket QR code — it will scan automatically.
+            </p>
+          </div>
+          {cameraOn && (
+            <div className="rounded-xl overflow-hidden border border-border/60 bg-black aspect-square max-w-md">
+              <Scanner
+                onScan={onScan}
+                onError={(err) => toast.error(err instanceof Error ? err.message : "Camera error")}
+                constraints={{ facingMode: "environment" }}
+                formats={["qr_code"]}
+                components={{ finder: true }}
+                styles={{ container: { width: "100%", height: "100%" } }}
+              />
+            </div>
+          )}
+        </SectionCard>
+
         <SectionCard title="🎫 Lookup ticket">
           <form onSubmit={doLookup} className="flex flex-col sm:flex-row gap-2">
             <input
@@ -122,6 +148,7 @@ function ScanPage() {
               {busy ? "Checking…" : "Look up"}
             </button>
           </form>
+
 
           {t && (
             <div className="mt-6 rounded-xl border border-border/60 p-4">
