@@ -78,16 +78,7 @@ function ScanPage() {
   const doLookup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code.trim()) return;
-    setBusy(true);
-    try {
-      const r = (await lookup({ data: { qr_code: code.trim() } })) as TicketResult;
-      setResult(r);
-      if (!r.ok) toast.error(r.reason ?? "Not found");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Lookup failed");
-    } finally {
-      setBusy(false);
-    }
+    await runLookup(code.trim());
   };
 
   const doMark = async () => {
